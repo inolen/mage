@@ -10,7 +10,7 @@ import mage.game.Game;
 import mage.game.permanent.Permanent;
 import mage.target.TargetImpl;
 
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.UUID;
 
@@ -60,7 +60,7 @@ public class TargetPermanentOrSuspendedCard extends TargetImpl {
 
     @Override
     public Set<UUID> possibleTargets(UUID sourceControllerId, Ability source, Game game) {
-        Set<UUID> possibleTargets = new HashSet<>();
+        Set<UUID> possibleTargets = new LinkedHashSet<>();
         for (Permanent permanent : game.getBattlefield().getActivePermanents(filter.getPermanentFilter(), sourceControllerId, game)) {
             if (filter.match(permanent, sourceControllerId, source, game)) {
                 possibleTargets.add(permanent.getId());

@@ -222,7 +222,7 @@ public abstract class TargetAmount extends TargetImpl {
     }
 
     final protected void addTargets(TargetAmount target, Set<UUID> possibleTargets, List<TargetAmount> options, Ability source, Game game) {
-        Set<UUID> usedTargets = new HashSet<>();
+        Set<UUID> usedTargets = new LinkedHashSet<>();
         for (UUID targetId : possibleTargets) {
             usedTargets.add(targetId);
             for (int n = 1; n <= target.remainingAmount; n++) {
@@ -231,7 +231,7 @@ public abstract class TargetAmount extends TargetImpl {
                 if (t.remainingAmount > 0) {
                     if (possibleTargets.size() > 1) {
                         // don't use that target again
-                        Set<UUID> newPossibleTargets = possibleTargets.stream().filter(newTarget -> !usedTargets.contains(newTarget)).collect(Collectors.toSet());
+                        Set<UUID> newPossibleTargets = possibleTargets.stream().filter(newTarget -> !usedTargets.contains(newTarget)).collect(Collectors.toCollection(java.util.LinkedHashSet::new));
                         addTargets(t, newPossibleTargets, options, source, game);
                     }
                 } else {

@@ -31,7 +31,7 @@ public class CombatGroup implements Serializable, Copyable<CombatGroup> {
     protected List<UUID> attackers = new ArrayList<>();
     protected List<UUID> formerAttackers = new ArrayList<>();
     protected List<UUID> blockers = new ArrayList<>();
-    protected Map<UUID, UUID> players = new HashMap<>();
+    protected Map<UUID, UUID> players = new LinkedHashMap<>();
     protected boolean blocked;
     protected UUID defenderId; // planeswalker, player, or battle id, can be null after remove from combat (e.g. due damage)
     protected UUID defendingPlayerId;
@@ -264,7 +264,7 @@ public class CombatGroup implements Serializable, Copyable<CombatGroup> {
         int damage = getDamageValueFromPermanent(attacker, game);
         if (dealsDamageThisStep(attacker, first, game)) {
             // must be set before attacker damage marking because of effects like Test of Faith
-            Map<UUID, Integer> blockerPower = new HashMap<>();
+            Map<UUID, Integer> blockerPower = new LinkedHashMap<>();
             for (UUID blockerId : blockers) {
                 Permanent blocker = game.getPermanent(blockerId);
                 if (dealsDamageThisStep(blocker, first, game)) {
@@ -273,7 +273,7 @@ public class CombatGroup implements Serializable, Copyable<CombatGroup> {
                     }
                 }
             }
-            Map<UUID, Integer> assigned = new HashMap<>();
+            Map<UUID, Integer> assigned = new LinkedHashMap<>();
             List<MultiAmountMessage> damageDivision = new ArrayList<>();
             List<UUID> blockersCopy = new ArrayList<>(blockers);
             if (blocked) {
@@ -366,7 +366,7 @@ public class CombatGroup implements Serializable, Copyable<CombatGroup> {
             int damage = getDamageValueFromPermanent(attacker, game);
             if (dealsDamageThisStep(attacker, first, game)) {
                 // must be set before attacker damage marking because of effects like Test of Faith
-                Map<UUID, Integer> blockerPower = new HashMap<>();
+                Map<UUID, Integer> blockerPower = new LinkedHashMap<>();
                 for (UUID blockerId : blockers) {
                     Permanent blocker = game.getPermanent(blockerId);
                     if (dealsDamageThisStep(blocker, first, game)) {
@@ -375,7 +375,7 @@ public class CombatGroup implements Serializable, Copyable<CombatGroup> {
                         }
                     }
                 }
-                Map<UUID, Integer> assigned = new HashMap<>();
+                Map<UUID, Integer> assigned = new LinkedHashMap<>();
                 for (Permanent defendingCreature : game.getBattlefield().getAllActivePermanents(StaticFilters.FILTER_PERMANENT_CREATURE, defendingPlayerId, game)) {
                     if (defendingCreature != null) {
                         if (!(damage > 0)) {
@@ -462,7 +462,7 @@ public class CombatGroup implements Serializable, Copyable<CombatGroup> {
         int damage = getDamageValueFromPermanent(blocker, game);
 
         if (dealsDamageThisStep(blocker, first, game)) {
-            Map<UUID, Integer> assigned = new HashMap<>();
+            Map<UUID, Integer> assigned = new LinkedHashMap<>();
             List<MultiAmountMessage> damageDivision = new ArrayList<>();
             List<UUID> attackersCopy = new ArrayList<>(attackers);
             int remainingDamage = damage;
@@ -667,10 +667,10 @@ public class CombatGroup implements Serializable, Copyable<CombatGroup> {
         }
 
         // collect possible blockers
-        Map<UUID, Set<UUID>> possibleBlockers = new HashMap<>();
+        Map<UUID, Set<UUID>> possibleBlockers = new LinkedHashMap<>();
         for (UUID attackerId : attackers) {
             Permanent attacker = game.getPermanent(attackerId);
-            Set<UUID> goodBlockers = new HashSet<>();
+            Set<UUID> goodBlockers = new LinkedHashSet<>();
             for (Permanent blocker : game.getBattlefield().getActivePermanents(StaticFilters.FILTER_PERMANENT_CREATURES_CONTROLLED, defender.getId(), game)) {
                 if (blocker.canBlock(attackerId, game)) {
                     goodBlockers.add(blocker.getId());

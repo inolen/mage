@@ -10,7 +10,7 @@ import mage.game.permanent.Permanent;
 import mage.players.Player;
 import mage.target.TargetAmount;
 
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
@@ -74,7 +74,7 @@ public abstract class TargetPermanentOrPlayerAmount extends TargetAmount {
 
     @Override
     public Set<UUID> possibleTargets(UUID sourceControllerId, Ability source, Game game) {
-        Set<UUID> possibleTargets = new HashSet<>();
+        Set<UUID> possibleTargets = new LinkedHashSet<>();
 
         game.getState()
                 .getPlayersInRange(sourceControllerId, game)

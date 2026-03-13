@@ -4,6 +4,7 @@ import mage.ApprovingObject;
 import mage.MageIdentifier;
 import mage.abilities.Ability;
 import mage.constants.Zone;
+import mage.util.RandomUtil;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -789,7 +790,7 @@ public class GameEvent implements Serializable {
         this.playerId = playerId;
         this.flag = flag;
         this.approvingObject = approvingObject;
-        this.id = UUID.randomUUID();
+        this.id = RandomUtil.randomUUID();
     }
 
     public EventType getType() {
@@ -798,6 +799,18 @@ public class GameEvent implements Serializable {
 
     public UUID getId() {
         return id;
+    }
+
+    @Override
+    public int hashCode() {
+        return id.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (!(obj instanceof GameEvent)) return false;
+        return id.equals(((GameEvent) obj).id);
     }
 
     /**

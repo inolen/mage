@@ -9,6 +9,7 @@ import mage.filter.predicate.Predicates;
 import mage.filter.predicate.permanent.PermanentIdPredicate;
 import mage.game.Game;
 import mage.util.ManaUtil;
+import mage.util.RandomUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -49,7 +50,7 @@ public class OathbreakerOnBattlefieldCondition implements Condition {
 
         if (compatibleList.isEmpty()) {
             // random id to disable condition
-            this.filter.add(new PermanentIdPredicate(UUID.randomUUID()));
+            this.filter.add(new PermanentIdPredicate(RandomUtil.randomUUID()));
         } else {
             // oathbreaker on battlefield
             this.filter.add(Predicates.or(compatibleList));

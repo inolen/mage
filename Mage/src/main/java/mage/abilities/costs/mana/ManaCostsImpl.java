@@ -22,6 +22,7 @@ import mage.target.Targets;
 import mage.target.common.TargetControlledPermanent;
 import mage.util.CardUtil;
 import mage.util.ManaUtil;
+import mage.util.RandomUtil;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -41,11 +42,11 @@ public class ManaCostsImpl<T extends ManaCost> extends ArrayList<T> implements M
     private static final Map<String, ManaCosts> costsCache = new ConcurrentHashMap<>(); // must be thread safe, can't use nulls
 
     public ManaCostsImpl() {
-        this.id = UUID.randomUUID();
+        this.id = RandomUtil.randomUUID();
     }
 
     public ManaCostsImpl(String mana) {
-        this.id = UUID.randomUUID();
+        this.id = RandomUtil.randomUUID();
         load(mana);
     }
 

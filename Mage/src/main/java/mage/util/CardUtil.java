@@ -625,7 +625,7 @@ public final class CardUtil {
     public static UUID getExileZoneId(String key, Game game) {
         UUID exileId = (UUID) game.getState().getValue(key);
         if (exileId == null) {
-            exileId = UUID.randomUUID();
+            exileId = RandomUtil.randomUUID();
             game.getState().setValue(key, exileId);
         }
         return exileId;

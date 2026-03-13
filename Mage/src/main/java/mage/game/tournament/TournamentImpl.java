@@ -27,7 +27,7 @@ public abstract class TournamentImpl implements Tournament {
 
     private static final Logger logger = Logger.getLogger(TournamentImpl.class);
 
-    protected UUID id = UUID.randomUUID();
+    protected UUID id = RandomUtil.randomUUID();
     protected UUID tableId = null; // assign on table create
     protected List<Round> rounds = new CopyOnWriteArrayList<>();
     protected Map<UUID, TournamentPlayer> players = new HashMap<>();

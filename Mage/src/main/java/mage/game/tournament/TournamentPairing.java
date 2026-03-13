@@ -6,6 +6,7 @@ import java.util.UUID;
 import mage.constants.TournamentPlayerState;
 import mage.game.match.Match;
 import mage.game.match.MatchPlayer;
+import mage.util.RandomUtil;
 
 /**
  *
@@ -13,7 +14,7 @@ import mage.game.match.MatchPlayer;
  */
 public class TournamentPairing {
 
-    private final UUID id = UUID.randomUUID();
+    private final UUID id = RandomUtil.randomUUID();
     private UUID tableId;
     private Match match;
     private final TournamentPlayer player1;

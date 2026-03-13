@@ -1,6 +1,6 @@
 package mage.target.common;
 
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.UUID;
 
@@ -72,7 +72,7 @@ public class TargetCardInOpponentsGraveyard extends TargetCard {
 
     @Override
     public Set<UUID> possibleTargets(UUID sourceControllerId, Ability source, Game game) {
-        Set<UUID> possibleTargets = new HashSet<>();
+        Set<UUID> possibleTargets = new LinkedHashSet<>();
         Player sourceController = game.getPlayer(sourceControllerId);
         for (UUID playerId : game.getState().getPlayersInRange(sourceControllerId, game)) {
             if (!sourceController.hasOpponent(playerId, game)) {
@@ -80,7 +80,7 @@ public class TargetCardInOpponentsGraveyard extends TargetCard {
             }
             Player player = game.getPlayer(playerId);
             if (player != null) {
-                Set<UUID> targetsInThisGraveyeard = new HashSet<>();
+                Set<UUID> targetsInThisGraveyeard = new LinkedHashSet<>();
                 for (Card card : player.getGraveyard().getCards(filter, sourceControllerId, source, game)) {
                     targetsInThisGraveyeard.add(card.getId());
                 }

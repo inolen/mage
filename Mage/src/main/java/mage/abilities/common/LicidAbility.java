@@ -18,6 +18,7 @@ import mage.game.permanent.Permanent;
 import mage.target.Target;
 import mage.target.common.TargetCreaturePermanent;
 import mage.target.targetpointer.FixedTarget;
+import mage.util.RandomUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -68,7 +69,7 @@ class LicidEffect extends OneShotEffect {
     public boolean apply(Game game, Ability source) {
         Permanent licid = source.getSourcePermanentIfItStillExists(game);
         if (licid != null) {
-            UUID messageId = UUID.randomUUID();
+            UUID messageId = RandomUtil.randomUUID();
             LicidContinuousEffect effect = new LicidContinuousEffect(messageId);
             effect.setTargetPointer(new FixedTarget(licid, game));
             game.addEffect(effect, source);

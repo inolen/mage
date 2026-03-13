@@ -2,6 +2,7 @@ package mage.game.command;
 
 import mage.game.permanent.token.TokenImpl;
 import mage.util.GameLog;
+import mage.util.RandomUtil;
 
 import java.util.UUID;
 
@@ -20,7 +21,7 @@ public abstract class CommandObjectImpl implements CommandObject {
     private int imageNumber;
 
     public CommandObjectImpl(String name) {
-        this.id = UUID.randomUUID();
+        this.id = RandomUtil.randomUUID();
         this.name = name;
     }
 
@@ -91,7 +92,7 @@ public abstract class CommandObjectImpl implements CommandObject {
 
     @Override
     public void assignNewId() {
-        this.id = UUID.randomUUID();
+        this.id = RandomUtil.randomUUID();
     }
 
     @Override

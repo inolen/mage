@@ -21,6 +21,7 @@ import mage.target.common.TargetSacrifice;
 import mage.target.targetpointer.FixedTarget;
 import mage.util.CardUtil;
 import mage.util.GameLog;
+import mage.util.RandomUtil;
 
 import java.util.Objects;
 import java.util.UUID;
@@ -183,7 +184,7 @@ class OfferingAsThoughEffect extends AsThoughEffectImpl {
                     game.getState().setValue("offering_" + card.getId(), true);
                     Permanent offer = game.getPermanent(target.getFirstTarget());
                     if (offer != null) {
-                        UUID activationId = UUID.randomUUID();
+                        UUID activationId = RandomUtil.randomUUID();
                         OfferingCostReductionEffect effect = new OfferingCostReductionEffect(activationId);
                         effect.setTargetPointer(new FixedTarget(offer, game));
                         game.addEffect(effect, source);

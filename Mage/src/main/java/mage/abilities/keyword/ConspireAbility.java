@@ -20,6 +20,7 @@ import mage.game.stack.Spell;
 import mage.players.Player;
 import mage.target.common.TargetControlledPermanent;
 import mage.util.CardUtil;
+import mage.util.RandomUtil;
 
 import java.util.UUID;
 
@@ -79,7 +80,7 @@ public class ConspireAbility extends StaticAbility implements OptionalAdditional
      */
     public ConspireAbility(ConspireTargets conspireTargets) {
         super(Zone.STACK, null);
-        this.conspireId = UUID.randomUUID();
+        this.conspireId = RandomUtil.randomUUID();
         reminderText = conspireTargets.getReminder();
         this.conspireCost = new OptionalAdditionalCostImpl(
                 keywordText, " ", reminderText,

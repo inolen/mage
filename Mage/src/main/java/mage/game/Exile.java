@@ -4,6 +4,7 @@ import mage.abilities.Ability;
 import mage.cards.Card;
 import mage.filter.FilterCard;
 import mage.util.Copyable;
+import mage.util.RandomUtil;
 
 import java.io.Serializable;
 import java.util.*;
@@ -15,7 +16,7 @@ import java.util.stream.Collectors;
  */
 public class Exile implements Serializable, Copyable<Exile> {
 
-    private static final UUID PERMANENT = UUID.randomUUID();
+    private static final UUID PERMANENT = RandomUtil.randomUUID();
 
     private final Map<UUID, ExileZone> exileZones = new HashMap<>();
 

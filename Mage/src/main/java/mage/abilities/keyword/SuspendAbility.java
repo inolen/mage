@@ -28,6 +28,7 @@ import mage.game.permanent.Permanent;
 import mage.players.Player;
 import mage.target.targetpointer.FixedTarget;
 import mage.util.CardUtil;
+import mage.util.RandomUtil;
 
 import java.util.Set;
 import java.util.UUID;
@@ -201,7 +202,7 @@ public class SuspendAbility extends SpecialAction {
     public static UUID getSuspendExileId(UUID controllerId, Game game) {
         UUID exileId = (UUID) game.getState().getValue("SuspendExileId" + controllerId.toString());
         if (exileId == null) {
-            exileId = UUID.randomUUID();
+            exileId = RandomUtil.randomUUID();
             game.getState().setValue("SuspendExileId" + controllerId, exileId);
         }
         return exileId;

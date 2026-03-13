@@ -442,14 +442,17 @@ public class ComputerPlayer6 extends ComputerPlayer {
     protected Integer addActionsTimed() {
         // TODO: all actions added and calculated one by one,
         //  multithreading do not supported here
+
+        // deterministic mode: run synchronously on current thread (no timeout, no thread scheduling variance)
+        if (COMPUTER_DISABLE_TIMEOUT_IN_GAME_SIMULATIONS) {
+            return addActions(root, maxDepth, Integer.MIN_VALUE, Integer.MAX_VALUE);
+        }
+
         // run new game simulation in parallel thread
         FutureTask<Integer> task = new FutureTask<>(() -> addActions(root, maxDepth, Integer.MIN_VALUE, Integer.MAX_VALUE));
         threadPoolSimulations.execute(task);
         try {
             int maxSeconds = maxThinkTimeSecs;
-            if (COMPUTER_DISABLE_TIMEOUT_IN_GAME_SIMULATIONS) {
-                maxSeconds = 3600;
-            }
             logger.debug("maxThink: " + maxSeconds + " seconds ");
             Integer res = task.get(maxSeconds, TimeUnit.SECONDS);
             if (res != null) {

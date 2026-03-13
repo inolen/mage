@@ -10,7 +10,7 @@ import mage.game.stack.StackAbility;
 import mage.game.stack.StackObject;
 import mage.target.TargetObject;
 
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.UUID;
 
@@ -59,7 +59,7 @@ public class TargetActivatedAbility extends TargetObject {
 
     @Override
     public Set<UUID> possibleTargets(UUID sourceControllerId, Ability source, Game game) {
-        Set<UUID> possibleTargets = new HashSet<>();
+        Set<UUID> possibleTargets = new LinkedHashSet<>();
         for (StackObject stackObject : game.getStack()) {
             if (stackObject.getStackAbility().isActivatedAbility()
                     && game.getState().getPlayersInRange(sourceControllerId, game).contains(stackObject.getStackAbility().getControllerId())

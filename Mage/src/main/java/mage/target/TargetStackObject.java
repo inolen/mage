@@ -7,7 +7,7 @@ import mage.filter.StaticFilters;
 import mage.game.Game;
 import mage.game.stack.StackObject;
 
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.UUID;
 
@@ -61,7 +61,7 @@ public class TargetStackObject extends TargetObject {
 
     @Override
     public Set<UUID> possibleTargets(UUID sourceControllerId, Ability source, Game game) {
-        Set<UUID> possibleTargets = new HashSet<>();
+        Set<UUID> possibleTargets = new LinkedHashSet<>();
         for (StackObject stackObject : game.getStack()) {
             if (game.getState().getPlayersInRange(sourceControllerId, game).contains(stackObject.getControllerId())
                     && filter.match(stackObject, sourceControllerId, source, game)) {

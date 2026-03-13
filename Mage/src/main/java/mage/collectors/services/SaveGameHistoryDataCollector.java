@@ -9,6 +9,7 @@ import mage.players.Player;
 import mage.util.CardUtil;
 import org.apache.log4j.Logger;
 import org.jsoup.Jsoup;
+import mage.util.RandomUtil;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -73,7 +74,7 @@ public class SaveGameHistoryDataCollector extends EmptyDataCollector {
     private static final String GAME_LOGS_FILE_NAME = "game_logs.html";
     private static final String GAME_CHAT_FILE_NAME = "game_chat.txt";
 
-    private static final UUID NO_TABLE_ID = UUID.randomUUID();
+    private static final UUID NO_TABLE_ID = RandomUtil.randomUUID();
     private static final String NO_TABLE_NAME = "SINGLE"; // need for unit tests
 
     // global switch

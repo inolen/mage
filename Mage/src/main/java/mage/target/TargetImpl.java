@@ -24,7 +24,7 @@ import java.util.*;
 public abstract class TargetImpl implements Target {
 
     protected final Map<UUID, Integer> targets = new LinkedHashMap<>();
-    protected final Map<UUID, Integer> zoneChangeCounters = new HashMap<>();
+    protected final Map<UUID, Integer> zoneChangeCounters = new LinkedHashMap<>();
 
     protected String targetName;
     protected Zone zone; // all targets will be filtered by that zone, don't use "multi-zone" filter
@@ -539,7 +539,7 @@ public abstract class TargetImpl implements Target {
     @Override
     public boolean isLegal(Ability source, Game game) {
         //20101001 - 608.2b
-        Set<UUID> illegalTargets = new HashSet<>();
+        Set<UUID> illegalTargets = new LinkedHashSet<>();
         for (UUID targetId : targets.keySet()) {
             Card card = game.getCard(targetId);
             if (card != null) {

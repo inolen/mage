@@ -50,6 +50,7 @@ import mage.util.GameLog;
 import mage.util.ThreadLocalStringBuilder;
 import mage.watchers.Watcher;
 import org.apache.log4j.Logger;
+import mage.util.RandomUtil;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -99,7 +100,7 @@ public abstract class AbilityImpl implements Ability {
     private Map<String, Object> costsTagMap = null;
 
     protected AbilityImpl(AbilityType abilityType, Zone zone) {
-        this.id = UUID.randomUUID();
+        this.id = RandomUtil.randomUUID();
         this.originalId = id;
         this.abilityType = abilityType;
         this.zone = zone;
@@ -153,9 +154,21 @@ public abstract class AbilityImpl implements Ability {
     }
 
     @Override
+    public int hashCode() {
+        return id.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (!(obj instanceof AbilityImpl)) return false;
+        return id.equals(((AbilityImpl) obj).id);
+    }
+
+    @Override
     public void newId() {
         if (!(this instanceof MageSingleton)) {
-            this.id = UUID.randomUUID();
+            this.id = RandomUtil.randomUUID();
         }
         getEffects().newId();
 
@@ -166,7 +179,7 @@ public abstract class AbilityImpl implements Ability {
 
     @Override
     public void newOriginalId() {
-        this.id = UUID.randomUUID();
+        this.id = RandomUtil.randomUUID();
         this.originalId = id;
         getEffects().newId();
     }

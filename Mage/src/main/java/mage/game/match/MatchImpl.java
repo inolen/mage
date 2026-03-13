@@ -26,7 +26,7 @@ public abstract class MatchImpl implements Match {
 
     private static final Logger logger = Logger.getLogger(MatchImpl.class);
 
-    protected UUID id = UUID.randomUUID();
+    protected UUID id = RandomUtil.randomUUID();
     protected List<MatchPlayer> players = new ArrayList<>();
     protected List<Game> games = new ArrayList<>();
     protected List<GameInfo> gamesInfo = new ArrayList<>();

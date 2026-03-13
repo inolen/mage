@@ -8,7 +8,7 @@ import mage.game.Game;
 import mage.game.stack.Spell;
 import mage.game.stack.StackObject;
 
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
 public class TargetSpell extends TargetObject {
 
     protected final FilterSpell filter;
-    private final Set<UUID> sourceIds = new HashSet<>();
+    private final Set<UUID> sourceIds = new LinkedHashSet<>();
 
     public TargetSpell() {
         this(1, 1, StaticFilters.FILTER_SPELL);
@@ -72,7 +72,7 @@ public class TargetSpell extends TargetObject {
         Set<UUID> possibleTargets = game.getStack().stream()
                 .filter(stackObject -> canBeChosen(stackObject, sourceControllerId, source, game))
                 .map(StackObject::getId)
-                .collect(Collectors.toSet());
+                .collect(Collectors.toCollection(java.util.LinkedHashSet::new));
         return keepValidPossibleTargets(possibleTargets, sourceControllerId, source, game);
     }
 

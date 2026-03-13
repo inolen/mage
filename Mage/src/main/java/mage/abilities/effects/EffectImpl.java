@@ -6,6 +6,7 @@ import mage.constants.EffectType;
 import mage.constants.Outcome;
 import mage.target.targetpointer.FirstTargetPointer;
 import mage.target.targetpointer.TargetPointer;
+import mage.util.RandomUtil;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -29,7 +30,7 @@ public abstract class EffectImpl implements Effect {
     protected String concatPrefix = ""; // combines multiple effects in text rule
 
     public EffectImpl(Outcome outcome) {
-        this.id = UUID.randomUUID();
+        this.id = RandomUtil.randomUUID();
         this.outcome = outcome;
 
         initNewTargetPointer();
@@ -59,6 +60,18 @@ public abstract class EffectImpl implements Effect {
     @Override
     public UUID getId() {
         return id;
+    }
+
+    @Override
+    public int hashCode() {
+        return id.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (!(obj instanceof EffectImpl)) return false;
+        return id.equals(((EffectImpl) obj).id);
     }
 
     @Override
@@ -113,7 +126,7 @@ public abstract class EffectImpl implements Effect {
     @Override
     public void newId() {
         if (!(this instanceof MageSingleton)) {
-            this.id = UUID.randomUUID();
+            this.id = RandomUtil.randomUUID();
         }
     }
 

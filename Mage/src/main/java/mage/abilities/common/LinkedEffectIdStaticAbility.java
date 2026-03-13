@@ -3,6 +3,7 @@ package mage.abilities.common;
 import mage.abilities.effects.Effect;
 import mage.constants.Zone;
 import mage.util.CardUtil;
+import mage.util.RandomUtil;
 
 import java.util.Objects;
 import java.util.UUID;
@@ -41,14 +42,14 @@ public class LinkedEffectIdStaticAbility extends SimpleStaticAbility {
 
     public LinkedEffectIdStaticAbility(Zone zone, ChildEffect effect) {
         super(Zone.BATTLEFIELD, effect);
-        this.linkedHandshake = UUID.randomUUID();
+        this.linkedHandshake = RandomUtil.randomUUID();
         initHandshake();
         setEffectIdManually();
     }
 
     private LinkedEffectIdStaticAbility(final LinkedEffectIdStaticAbility effect) {
         super(effect);
-        this.linkedHandshake = UUID.randomUUID();
+        this.linkedHandshake = RandomUtil.randomUUID();
         initHandshake();
     }
 
@@ -58,7 +59,7 @@ public class LinkedEffectIdStaticAbility extends SimpleStaticAbility {
     }
 
     private void initHandshake() {
-        this.linkedHandshake = UUID.randomUUID();
+        this.linkedHandshake = RandomUtil.randomUUID();
         CardUtil.castStream(this.getEffects().stream(), ChildEffect.class)
                 .filter(Objects::nonNull)
                 .forEach(e -> e.setParentLinkHandshake(linkedHandshake));

@@ -52,7 +52,7 @@ public class ComputerPlayer extends PlayerImpl {
     protected static final int PASSIVITY_PENALTY = 5; // Penalty value for doing nothing if some actions are available
 
     // debug only: set TRUE to debug simulation's code/games (on false sim thread will be stopped after few secs by timeout)
-    public static final boolean COMPUTER_DISABLE_TIMEOUT_IN_GAME_SIMULATIONS = false; // DebugUtil.AI_ENABLE_DEBUG_MODE;
+    public static final boolean COMPUTER_DISABLE_TIMEOUT_IN_GAME_SIMULATIONS = Boolean.getBoolean("xmage.ai.disableSimTimeout");
 
     // AI agents uses game simulation thread for all calcs and it's high CPU consumption
     // More AI threads - more parallel AI games can be calculate

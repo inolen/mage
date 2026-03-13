@@ -4,6 +4,7 @@ import mage.abilities.Ability;
 import mage.game.Game;
 import mage.target.Target;
 import mage.target.Targets;
+import mage.util.RandomUtil;
 
 import java.util.UUID;
 
@@ -15,7 +16,7 @@ public abstract class CostImpl implements Cost {
     private Targets targets;
 
     public CostImpl() {
-        id = UUID.randomUUID();
+        id = RandomUtil.randomUUID();
         paid = false;
         targets = null; // rare usage, must be null by default for performance optimization
     }
@@ -83,5 +84,17 @@ public abstract class CostImpl implements Cost {
     @Override
     public UUID getId() {
         return this.id;
+    }
+
+    @Override
+    public int hashCode() {
+        return id.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (!(obj instanceof CostImpl)) return false;
+        return id.equals(((CostImpl) obj).id);
     }
 }

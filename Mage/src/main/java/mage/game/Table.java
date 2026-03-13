@@ -4,6 +4,7 @@ package mage.game;
 import java.io.Serializable;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
+import mage.util.RandomUtil;
 
 import mage.cards.decks.DeckValidator;
 import mage.collectors.DataCollectorServices;
@@ -75,7 +76,7 @@ public class Table implements Serializable {
     }
 
     protected Table(UUID roomId, String gameType, String name, String controllerName, DeckValidator validator, List<PlayerType> playerTypes, TableRecorder recorder, Set<String> bannedUsernames, boolean isPlaneChase) {
-        this.tableId = UUID.randomUUID();
+        this.tableId = RandomUtil.randomUUID();
         this.tableIndex = GLOBAL_INDEX.incrementAndGet();
         this.roomId = roomId;
         this.numSeats = playerTypes.size();

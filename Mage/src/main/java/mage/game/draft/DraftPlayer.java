@@ -9,6 +9,7 @@ import java.util.UUID;
 import mage.cards.Card;
 import mage.cards.decks.Deck;
 import mage.players.Player;
+import mage.util.RandomUtil;
 
 /**
  *
@@ -26,7 +27,7 @@ public class DraftPlayer {
     protected Set<UUID> hiddenCards;
 
     public DraftPlayer(Player player) {
-        id = UUID.randomUUID();
+        id = RandomUtil.randomUUID();
         this.player = player;
         this.deck = new Deck();
         hiddenCards = new HashSet<>();

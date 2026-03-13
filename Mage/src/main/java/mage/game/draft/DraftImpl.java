@@ -10,6 +10,7 @@ import mage.players.PlayerList;
 import mage.util.ThreadUtils;
 import mage.util.XmageThreadFactory;
 import org.apache.log4j.Logger;
+import mage.util.RandomUtil;
 
 import java.util.*;
 import java.util.concurrent.Executors;
@@ -48,7 +49,7 @@ public abstract class DraftImpl implements Draft {
     protected ScheduledExecutorService boosterSendingExecutor = null;
 
     public DraftImpl(DraftOptions options, List<ExpansionSet> sets) {
-        this.id = UUID.randomUUID();
+        this.id = RandomUtil.randomUUID();
         this.setCodes = options.getSetCodes();
         this.draftCube = options.getDraftCube();
         this.timing = options.getTiming();

@@ -33,7 +33,7 @@ public class TargetTappedPermanentAsYouCast extends TargetPermanent {
         Set<UUID> possibleTargets = game.getBattlefield().getActivePermanents(getFilter(), sourceControllerId, source, game).stream()
                 .filter(Permanent::isTapped)
                 .map(Permanent::getId)
-                .collect(Collectors.toSet());
+                .collect(Collectors.toCollection(java.util.LinkedHashSet::new));
         return keepValidPossibleTargets(possibleTargets, sourceControllerId, source, game);
     }
 

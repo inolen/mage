@@ -45,7 +45,7 @@ public class TargetOptimization {
         // - add random target from random group until fill all remainingAmount condition
 
         // use one target per group
-        Set<UUID> newPossibleTargets = new HashSet<>();
+        Set<UUID> newPossibleTargets = new LinkedHashSet<>();
         targetGroups.forEach((groupKey, groupTargets) -> {
             UUID targetId = RandomUtil.randomFromCollection(groupTargets);
             if (targetId != null) {
@@ -78,7 +78,7 @@ public class TargetOptimization {
     }
 
     private static Map<String, ArrayList<UUID>> createGroups(Game game, Set<UUID> possibleTargets, int maxPossibleTargetsToSimulate, boolean isLoose) {
-        Map<String, ArrayList<UUID>> targetGroups = new HashMap<>();
+        Map<String, ArrayList<UUID>> targetGroups = new LinkedHashMap<>();
 
         possibleTargets.forEach(id -> {
             String groupKey = "";
@@ -222,7 +222,7 @@ public class TargetOptimization {
         // print table
         List<UUID> list = new ArrayList<>(possibleTargets);
         Collections.sort(list);
-        HashMap<UUID, Integer> targetNumbers = new HashMap<>();
+        HashMap<UUID, Integer> targetNumbers = new LinkedHashMap<>();
         System.out.println();
         System.out.println(String.format("Targets (%s): %d", info, list.size()));
         for (int i = 0; i < list.size(); i++) {

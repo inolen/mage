@@ -118,7 +118,7 @@ public interface Target extends Copyable<Target>, Serializable {
         // do not override
         return possibleTargets(sourceControllerId, source, game).stream()
                 .filter(id -> cards == null || cards.contains(id))
-                .collect(Collectors.toSet());
+                .collect(Collectors.toCollection(java.util.LinkedHashSet::new));
     }
 
     /**
@@ -154,7 +154,7 @@ public interface Target extends Copyable<Target>, Serializable {
                     }
                     return true;
                 })
-                .collect(Collectors.toSet());
+                .collect(Collectors.toCollection(java.util.LinkedHashSet::new));
     }
 
     /**

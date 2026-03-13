@@ -16,6 +16,7 @@ import mage.game.Game;
 import mage.game.events.GameEvent;
 import mage.players.Player;
 import mage.util.CardUtil;
+import mage.util.RandomUtil;
 
 import java.util.List;
 import java.util.Set;
@@ -90,7 +91,7 @@ public class PlotAbility extends SpecialAction {
     static UUID getPlotExileId(UUID playerId, Game game) {
         UUID exileId = (UUID) game.getState().getValue("PlotExileId" + playerId.toString());
         if (exileId == null) {
-            exileId = UUID.randomUUID();
+            exileId = RandomUtil.randomUUID();
             game.getState().setValue("PlotExileId" + playerId, exileId);
         }
         return exileId;

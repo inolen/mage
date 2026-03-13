@@ -313,6 +313,18 @@ public class StackAbility extends StackObjectImpl implements Ability {
     }
 
     @Override
+    public int hashCode() {
+        return this.ability.getId().hashCode();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (!(obj instanceof StackAbility)) return false;
+        return this.ability.getId().equals(((StackAbility) obj).ability.getId());
+    }
+
+    @Override
     public UUID getSourceId() {
         return this.ability.getSourceId();
     }

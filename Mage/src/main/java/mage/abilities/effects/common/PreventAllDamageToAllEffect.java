@@ -12,6 +12,7 @@ import mage.filter.predicate.permanent.PermanentIdPredicate;
 import mage.game.Game;
 import mage.game.events.GameEvent;
 import mage.game.events.GameEvent.EventType;
+import mage.util.RandomUtil;
 
 import java.util.UUID;
 
@@ -62,12 +63,12 @@ public class PreventAllDamageToAllEffect extends PreventionEffectImpl {
         FilterPermanent filter1 = filterPermanent;
         if (filter1 == null) {
             filter1 = new FilterPermanent();
-            filter1.add(new PermanentIdPredicate(UUID.randomUUID())); // disable filter
+            filter1.add(new PermanentIdPredicate(RandomUtil.randomUUID())); // disable filter
         }
         FilterPlayer filter2 = filterPlayer;
         if (filter2 == null) {
             filter2 = new FilterPlayer();
-            filter2.add(new PlayerIdPredicate(UUID.randomUUID())); // disable filter
+            filter2.add(new PlayerIdPredicate(RandomUtil.randomUUID())); // disable filter
         }
 
         return new FilterPermanentOrPlayer(message, filter1, filter2);

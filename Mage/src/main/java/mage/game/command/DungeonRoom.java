@@ -12,6 +12,7 @@ import mage.game.stack.StackObject;
 import mage.players.Player;
 import mage.target.Target;
 import mage.util.CardUtil;
+import mage.util.RandomUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,7 +29,7 @@ public class DungeonRoom {
     private final RoomTriggeredAbility roomTriggeredAbility;
 
     public DungeonRoom(String name, Effect... effects) {
-        this.id = UUID.randomUUID();
+        this.id = RandomUtil.randomUUID();
         this.name = name;
         roomTriggeredAbility = new RoomTriggeredAbility(this, effects);
     }

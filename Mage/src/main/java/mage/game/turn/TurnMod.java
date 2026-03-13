@@ -6,6 +6,7 @@ import mage.constants.TurnPhase;
 import mage.game.Game;
 import mage.util.CardUtil;
 import mage.util.Copyable;
+import mage.util.RandomUtil;
 
 import java.io.Serializable;
 import java.util.UUID;
@@ -83,7 +84,7 @@ public class TurnMod implements Serializable, Copyable<TurnMod> {
 
     public TurnMod(UUID playerId) {
         // TODO: delete
-        this.id = UUID.randomUUID();
+        this.id = RandomUtil.randomUUID();
         this.playerId = playerId;
     }
 

@@ -7,6 +7,7 @@ import mage.game.stack.StackObject;
 import mage.players.Player;
 import mage.target.Target;
 import mage.target.Targets;
+import mage.util.RandomUtil;
 
 import java.util.UUID;
 
@@ -34,7 +35,7 @@ public abstract class VariableCostImpl implements Cost, VariableCost {
      *                   from your graveyard")
      */
     public VariableCostImpl(VariableCostType costType, String xText, String actionText) {
-        this.id = UUID.randomUUID();
+        this.id = RandomUtil.randomUUID();
         this.costType = costType;
         this.paid = false;
         this.targets = null; // rare usage, must be null by default for performance optimization
@@ -111,6 +112,18 @@ public abstract class VariableCostImpl implements Cost, VariableCost {
     @Override
     public UUID getId() {
         return this.id;
+    }
+
+    @Override
+    public int hashCode() {
+        return id.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (!(obj instanceof VariableCostImpl)) return false;
+        return id.equals(((VariableCostImpl) obj).id);
     }
 
     @Override

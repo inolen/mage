@@ -8,7 +8,7 @@ import mage.game.ExileZone;
 import mage.game.Game;
 import mage.target.TargetCard;
 
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.UUID;
 
@@ -49,7 +49,7 @@ public class TargetCardInExile extends TargetCard {
 
     @Override
     public Set<UUID> possibleTargets(UUID sourceControllerId, Ability source, Game game) {
-        Set<UUID> possibleTargets = new HashSet<>();
+        Set<UUID> possibleTargets = new LinkedHashSet<>();
 
         if (zoneId == null) { // no specific exile zone
             for (Card card : game.getExile().getCardsInRange(game, sourceControllerId)) {

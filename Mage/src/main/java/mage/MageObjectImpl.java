@@ -18,6 +18,7 @@ import mage.game.events.ZoneChangeEvent;
 import mage.util.GameLog;
 import mage.util.SubTypes;
 import org.apache.log4j.Logger;
+import mage.util.RandomUtil;
 
 import java.util.*;
 
@@ -55,7 +56,7 @@ public abstract class MageObjectImpl implements MageObject {
     protected MageObject copyFrom; // copied card INFO (used to call original adjusters)
 
     public MageObjectImpl() {
-        this(UUID.randomUUID());
+        this(RandomUtil.randomUUID());
     }
 
     public MageObjectImpl(UUID id) {
@@ -97,6 +98,18 @@ public abstract class MageObjectImpl implements MageObject {
     @Override
     public UUID getId() {
         return objectId;
+    }
+
+    @Override
+    public int hashCode() {
+        return objectId.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (!(obj instanceof MageObjectImpl)) return false;
+        return objectId.equals(((MageObjectImpl) obj).objectId);
     }
 
     @Override

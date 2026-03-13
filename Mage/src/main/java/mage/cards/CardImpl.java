@@ -28,6 +28,7 @@ import mage.util.GameLog;
 import mage.util.ManaUtil;
 import mage.watchers.Watcher;
 import org.apache.log4j.Logger;
+import mage.util.RandomUtil;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -144,7 +145,7 @@ public abstract class CardImpl extends MageObjectImpl implements Card {
 
     @Override
     public void assignNewId() {
-        this.objectId = UUID.randomUUID();
+        this.objectId = RandomUtil.randomUUID();
         this.abilities.newOriginalId();
         this.abilities.setSourceId(objectId);
         if (this.spellAbility != null) {

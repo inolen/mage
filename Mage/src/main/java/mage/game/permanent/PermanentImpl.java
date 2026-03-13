@@ -41,6 +41,7 @@ import mage.util.CardUtil;
 import mage.util.GameLog;
 import mage.util.ThreadLocalStringBuilder;
 import org.apache.log4j.Logger;
+import mage.util.RandomUtil;
 
 import java.io.Serializable;
 import java.util.*;
@@ -2076,7 +2077,7 @@ public abstract class PermanentImpl extends CardImpl implements Permanent {
             Set<MageObjectReference> morSet = new HashSet<>();
             morSet.add(new MageObjectReference(this, game));
             morSet.add(new MageObjectReference(fightTarget, game));
-            String data = UUID.randomUUID().toString();
+            String data = RandomUtil.randomUUID().toString();
             game.getState().setValue("batchFight_" + data, morSet);
             game.fireEvent(GameEvent.getEvent(GameEvent.EventType.BATCH_FIGHT, getId(), source, source.getControllerId(), data, 0));
         }

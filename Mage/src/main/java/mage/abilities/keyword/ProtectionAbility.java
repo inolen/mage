@@ -15,6 +15,7 @@ import mage.game.permanent.token.Token;
 import mage.game.stack.Spell;
 import mage.players.Player;
 import mage.util.CardUtil;
+import mage.util.RandomUtil;
 
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -110,7 +111,7 @@ public class ProtectionAbility extends StaticAbility {
                 // make fake permanent cause it checked before real permanent create
                 // warning, Token don't have controllerId info, so it can be a problem here
                 // TODO: wtf, possible bugged for filters that checking controller/player (if so then use with controllerId param)
-                PermanentToken fakePermanent = new PermanentToken((Token) source, UUID.randomUUID(), game);
+                PermanentToken fakePermanent = new PermanentToken((Token) source, RandomUtil.randomUUID(), game);
                 return !((FilterCard) filter).match(fakePermanent, game);
             }
             return true;

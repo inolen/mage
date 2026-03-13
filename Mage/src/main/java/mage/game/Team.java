@@ -6,6 +6,7 @@ import java.util.UUID;
 import mage.MageItem;
 import mage.players.Player;
 import mage.players.Players;
+import mage.util.RandomUtil;
 
 /**
  *
@@ -18,7 +19,7 @@ public class Team implements MageItem {
     private Players players = new Players();
 
     public Team (String name) {
-        teamId = UUID.randomUUID();
+        teamId = RandomUtil.randomUUID();
         this.name = name;
     }
 

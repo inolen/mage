@@ -44,6 +44,17 @@ public final class RandomUtil {
         random.setSeed(newSeed);
     }
 
+    public static UUID randomUUID() {
+        byte[] data = new byte[16];
+        random.nextBytes(data);
+        data[6] = (byte) (data[6] & 0x0f | 0x40); // version 4
+        data[8] = (byte) (data[8] & 0x3f | 0x80); // IETF variant
+        long msb = 0, lsb = 0;
+        for (int i = 0; i < 8; i++) msb = (msb << 8) | (data[i] & 0xff);
+        for (int i = 8; i < 16; i++) lsb = (lsb << 8) | (data[i] & 0xff);
+        return new UUID(msb, lsb);
+    }
+
     public static <T> T randomFromCollection(Collection<T> collection) {
         if (collection.size() < 2) {
             return collection.stream().findFirst().orElse(null);

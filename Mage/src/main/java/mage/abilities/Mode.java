@@ -5,6 +5,7 @@ import mage.abilities.effects.Effect;
 import mage.abilities.effects.Effects;
 import mage.target.Target;
 import mage.target.Targets;
+import mage.util.RandomUtil;
 
 import java.io.Serializable;
 import java.util.UUID;
@@ -28,7 +29,7 @@ public class Mode implements Serializable {
     protected String modeTag;
 
     public Mode(Effect effect) {
-        this.id = UUID.randomUUID();
+        this.id = RandomUtil.randomUUID();
         this.targets = new Targets();
         this.effects = new Effects();
         if (effect != null) {
@@ -47,7 +48,7 @@ public class Mode implements Serializable {
     }
 
     public UUID setRandomId() {
-        return this.id = UUID.randomUUID();
+        return this.id = RandomUtil.randomUUID();
     }
 
     public Mode copy() {
@@ -56,6 +57,18 @@ public class Mode implements Serializable {
 
     public UUID getId() {
         return id;
+    }
+
+    @Override
+    public int hashCode() {
+        return id.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (!(obj instanceof Mode)) return false;
+        return id.equals(((Mode) obj).id);
     }
 
     public Targets getTargets() {

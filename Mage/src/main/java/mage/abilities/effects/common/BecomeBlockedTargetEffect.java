@@ -9,6 +9,7 @@ import mage.game.Game;
 import mage.game.combat.CombatGroup;
 import mage.game.events.GameEvent;
 import mage.game.permanent.Permanent;
+import mage.util.RandomUtil;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -52,7 +53,7 @@ public class BecomeBlockedTargetEffect extends OneShotEffect {
             game.fireEvent(GameEvent.getEvent(GameEvent.EventType.CREATURE_BLOCKED, permanent.getId(), source, null));
             morSet.add(new MageObjectReference(permanent, game));
         }
-        String key = UUID.randomUUID().toString();
+        String key = RandomUtil.randomUUID().toString();
         game.getState().setValue("becameBlocked_" + key, morSet);
         game.fireEvent(GameEvent.getEvent(
                 GameEvent.EventType.BATCH_BLOCK_NONCOMBAT,

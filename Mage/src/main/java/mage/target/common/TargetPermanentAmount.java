@@ -107,7 +107,7 @@ public class TargetPermanentAmount extends TargetAmount {
                 .getActivePermanents(filter, sourceControllerId, source, game)
                 .stream()
                 .map(Permanent::getId)
-                .collect(Collectors.toSet());
+                .collect(Collectors.toCollection(java.util.LinkedHashSet::new));
         return keepValidPossibleTargets(possibleTargets, sourceControllerId, source, game);
     }
 

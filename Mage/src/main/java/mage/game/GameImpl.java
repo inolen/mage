@@ -76,6 +76,7 @@ import mage.util.functions.CopyApplier;
 import mage.watchers.Watcher;
 import mage.watchers.common.*;
 import org.apache.log4j.Logger;
+import mage.util.RandomUtil;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -173,7 +174,7 @@ public abstract class GameImpl implements Game {
     private final LinkedList<UUID> concedingPlayers = new LinkedList<>();
 
     public GameImpl(MultiplayerAttackOption attackOption, RangeOfInfluence range, Mulligan mulligan, int minimumDeckSize, int startingLife, int startingHandSize) {
-        this.id = UUID.randomUUID();
+        this.id = RandomUtil.randomUUID();
         this.gameIndex = GLOBAL_INDEX.incrementAndGet();
         this.range = range;
         this.mulligan = mulligan;

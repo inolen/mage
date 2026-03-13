@@ -15,6 +15,7 @@ import mage.constants.SuperType;
 import mage.game.Game;
 import mage.game.events.ZoneChangeEvent;
 import mage.util.SubTypes;
+import mage.util.RandomUtil;
 
 import java.util.Collections;
 import java.util.List;
@@ -38,7 +39,7 @@ public abstract class Designation extends MageObjectImpl {
     }
 
     public Designation(DesignationType designationType, boolean unique) {
-        super(UUID.randomUUID());
+        super(RandomUtil.randomUUID());
         this.designationType = designationType;
         this.unique = unique;
         this.name = designationType.toString();
