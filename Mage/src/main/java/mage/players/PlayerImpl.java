@@ -20,6 +20,8 @@ import mage.abilities.mana.ManaOptions;
 import mage.cards.*;
 import mage.cards.decks.Deck;
 import mage.choices.Choice;
+import mage.collectors.DataCollectorServices;
+
 import mage.choices.ChoiceImpl;
 import mage.constants.*;
 import mage.counters.Counter;
@@ -799,6 +801,7 @@ public abstract class PlayerImpl implements Player, Serializable {
                 numDrawn++;
             }
         }
+        DataCollectorServices.getInstance().onTopCardMayHaveChanged(game, this);
         if ((!isTopCardRevealed() || isDrawsFromBottom()) && numDrawn > 0) {
             game.fireInformEvent(getLogName() + " draws " + CardUtil.numberToText(numDrawn, "a")
                     + " card" + (numDrawn > 1 ? "s" : "")
@@ -1889,6 +1892,7 @@ public abstract class PlayerImpl implements Player, Serializable {
                 game.informPlayers(getLogName() + "'s library is shuffled" + CardUtil.getSourceLogName(game, source));
             }
             game.fireEvent(GameEvent.getEvent(GameEvent.EventType.LIBRARY_SHUFFLED, playerId, source, playerId));
+            DataCollectorServices.getInstance().onTopCardMayHaveChanged(game, this);
         }
     }
 
@@ -1917,6 +1921,7 @@ public abstract class PlayerImpl implements Player, Serializable {
         if (cards == null || cards.isEmpty()) {
             return;
         }
+        DataCollectorServices.getInstance().onCardsRevealed(game, this, cards);
         if (postToLog) {
             game.getState().getRevealed().add(CardUtil.createObjectRelatedWindowTitle(source, game, titleSuffix), cards);
         } else {
@@ -1955,6 +1960,7 @@ public abstract class PlayerImpl implements Player, Serializable {
 
     @Override
     public void lookAtCards(Ability source, String titleSuffix, Cards cards, Game game) {
+        DataCollectorServices.getInstance().onCardsLookedAt(game, this, cards);
         game.getState().getLookedAt(this.playerId).add(CardUtil.createObjectRelatedWindowTitle(source, game, titleSuffix), cards);
         game.fireUpdatePlayersEvent();
     }
@@ -2966,6 +2972,9 @@ public abstract class PlayerImpl implements Player, Serializable {
                 target.getTargets().clear();
                 for (UUID targetId : newTarget.getTargets()) {
                     target.add(targetId, game);
+                }
+                if (!game.isSimulation()) {
+                    DataCollectorServices.getInstance().onChoose(game, this, target, ChooseKind.GENERIC);
                 }
             }
 
@@ -4652,8 +4661,12 @@ public abstract class PlayerImpl implements Player, Serializable {
     }
 
     @Override
-    public void setTopCardRevealed(boolean topCardRevealed) {
+    public void setTopCardRevealed(boolean topCardRevealed, Game game) {
+        boolean was = this.topCardRevealed;
         this.topCardRevealed = topCardRevealed;
+        if (topCardRevealed && !was) {
+            DataCollectorServices.getInstance().onTopCardMayHaveChanged(game, this);
+        }
     }
 
     @Override
@@ -5681,6 +5694,122 @@ public abstract class PlayerImpl implements Player, Serializable {
     @Override
     public SpellAbility chooseAbilityForCast(Card card, Game game, boolean noMana) {
         return card.getSpellAbility();
+    }
+
+    /* ------------------------------------------------------------------
+     * choose / chooseTarget wrappers
+     *
+     * Each wrapper delegates to a doXxx method (overridden by subclasses)
+     * then fires the onChoose data-collector callback with a ChooseKind.
+     * Subclasses that need completely custom behaviour (e.g. HumanPlayer)
+     * can still override choose/chooseTarget directly — the callback
+     * simply won't fire, which is fine for non-replay scenarios.
+     * ------------------------------------------------------------------ */
+
+    @Override
+    public boolean choose(Outcome outcome, Target target, Ability source, Game game) {
+        boolean result = doChoose(outcome, target, source, game);
+        if (!game.isSimulation()) {
+            DataCollectorServices.getInstance().onChoose(game, this, target, ChooseKind.GENERIC);
+        }
+        return result;
+    }
+
+    @Override
+    public boolean choose(Outcome outcome, Target target, Ability source, Game game, Map<String, Serializable> options) {
+        boolean result = doChoose(outcome, target, source, game, options);
+        if (!game.isSimulation()) {
+            DataCollectorServices.getInstance().onChoose(game, this, target, ChooseKind.GENERIC);
+        }
+        return result;
+    }
+
+    @Override
+    public boolean choose(Outcome outcome, Cards cards, TargetCard target, Ability source, Game game) {
+        boolean result = doChoose(outcome, cards, target, source, game);
+        if (!game.isSimulation()) {
+            DataCollectorServices.getInstance().onChoose(game, this, target, ChooseKind.GENERIC);
+        }
+        return result;
+    }
+
+    @Override
+    public boolean choose(Outcome outcome, Choice choice, Game game) {
+        boolean result = doChoose(outcome, choice, game);
+        if (!game.isSimulation()) {
+            ChooseKind kind = choice.isManaColorChoice() ? ChooseKind.PAYMENT : ChooseKind.GENERIC;
+            DataCollectorServices.getInstance().onChoose(game, this, choice, kind);
+        }
+        return result;
+    }
+
+    @Override
+    public boolean chooseTarget(Outcome outcome, Target target, Ability source, Game game) {
+        boolean result = doChooseTarget(outcome, target, source, game);
+        if (!game.isSimulation()) {
+            DataCollectorServices.getInstance().onChoose(game, this, target, ChooseKind.TARGET);
+        }
+        return result;
+    }
+
+    @Override
+    public boolean chooseTarget(Outcome outcome, Cards cards, TargetCard target, Ability source, Game game) {
+        boolean result = doChooseTarget(outcome, cards, target, source, game);
+        if (!game.isSimulation()) {
+            DataCollectorServices.getInstance().onChoose(game, this, target, ChooseKind.TARGET);
+        }
+        return result;
+    }
+
+    protected boolean doChoose(Outcome outcome, Target target, Ability source, Game game) {
+        return false;
+    }
+
+    protected boolean doChoose(Outcome outcome, Target target, Ability source, Game game, Map<String, Serializable> options) {
+        return false;
+    }
+
+    protected boolean doChoose(Outcome outcome, Cards cards, TargetCard target, Ability source, Game game) {
+        return false;
+    }
+
+    protected boolean doChoose(Outcome outcome, Choice choice, Game game) {
+        return false;
+    }
+
+    protected boolean doChooseTarget(Outcome outcome, Target target, Ability source, Game game) {
+        return false;
+    }
+
+    protected boolean doChooseTarget(Outcome outcome, Cards cards, TargetCard target, Ability source, Game game) {
+        return false;
+    }
+
+    @Override
+    public boolean chooseUse(Outcome outcome, String message, Ability source, Game game) {
+        return chooseUse(outcome, message, null, null, null, source, game);
+    }
+
+    @Override
+    public boolean chooseUse(Outcome outcome, String message, String secondMessage, String trueText, String falseText, Ability source, Game game) {
+        boolean result = doChooseUse(outcome, message, secondMessage, trueText, falseText, source, game);
+        if (!game.isSimulation()) {
+            DataCollectorServices.getInstance().onChooseUse(game, this, result);
+        }
+        return result;
+    }
+
+    protected boolean doChooseUse(Outcome outcome, String message, String secondMessage, String trueText, String falseText, Ability source, Game game) {
+        return false;
+    }
+
+    @Override
+    public Card chooseRandomCard(Cards cards, Game game) {
+        Card card = cards.getRandom(game);
+        if (card != null) {
+            DataCollectorServices.getInstance().onChooseRandom(game, this, card);
+        }
+        return card;
     }
 
     @Override

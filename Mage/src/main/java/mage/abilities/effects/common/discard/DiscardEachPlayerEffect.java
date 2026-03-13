@@ -94,7 +94,7 @@ public class DiscardEachPlayerEffect extends OneShotEffect {
                         numberOfCardsToDiscard, numberOfCardsToDiscard,
                         StaticFilters.FILTER_CARD, playerId
                 );
-                player.chooseTarget(outcome, target, source, game);
+                target.choose(Outcome.Discard, playerId, source, game);
                 cards.addAll(target.getTargets());
             }
             cardsToDiscard.put(playerId, cards);

@@ -1,6 +1,7 @@
 package mage.game.turn;
 
 import mage.abilities.Ability;
+import mage.collectors.DataCollectorServices;
 import mage.constants.PhaseStep;
 import mage.constants.TurnPhase;
 import mage.game.Game;
@@ -106,6 +107,7 @@ public class Turn implements Serializable {
         // turn control must be called after potential turn skip due 720.1.
         checkTurnIsControlledByOtherPlayer(game, activePlayer.getId());
 
+        DataCollectorServices.getInstance().onTurnBegin(game);
         game.getPlayer(activePlayer.getId()).beginTurn(game);
         GameEvent event = new GameEvent(GameEvent.EventType.BEGIN_TURN, null, null, activePlayer.getId());
         game.fireEvent(event);
@@ -148,6 +150,7 @@ public class Turn implements Serializable {
                 }
             }
         }
+        DataCollectorServices.getInstance().onTurnEnd(game);
         return false;
     }
 

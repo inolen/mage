@@ -91,7 +91,7 @@ class TheDeathOfGwenStacyEffect extends OneShotEffect {
             if (player != null) {
                 Target target = new TargetDiscard(0, 1, new FilterCard(), playerId)
                         .withChooseHint("Choose a card to discard or lose 3 life");
-                player.chooseTarget(outcome, target, source, game);
+                target.choose(Outcome.Discard, playerId, source, game);
                 Cards cards = new CardsImpl(target.getTargets());
                 cardsToDiscard.put(playerId, cards);
             }

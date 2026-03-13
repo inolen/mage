@@ -81,7 +81,7 @@ class BorderlandExplorerEffect extends OneShotEffect {
                 Player player = game.getPlayer(playerId);
                 if (player != null) {
                     Target target = new TargetDiscard(0, 1, new FilterCard(), playerId);
-                    player.chooseTarget(outcome, target, source, game);
+                    target.choose(Outcome.Discard, playerId, source, game);
                     Cards cards = new CardsImpl(target.getTargets());
                     cardsToDiscard.put(playerId, cards);
                 }

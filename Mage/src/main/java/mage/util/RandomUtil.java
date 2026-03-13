@@ -3,7 +3,6 @@ package mage.util;
 import java.awt.*;
 import java.util.Collection;
 import java.util.Random;
-import java.util.Set;
 import java.util.UUID;
 
 /**

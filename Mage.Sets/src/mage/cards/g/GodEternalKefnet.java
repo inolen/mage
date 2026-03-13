@@ -87,7 +87,7 @@ class GodEternalKefnetDrawCardReplacementEffect extends ReplacementEffectImpl {
         }
 
         // reveal
-        you.setTopCardRevealed(true);
+        you.setTopCardRevealed(true, game);
 
         // cast copy
         if (topCard.isInstantOrSorcery(game)

@@ -1,11 +1,16 @@
 package mage.collectors;
 
+import mage.cards.Card;
+import mage.collectors.services.StaxReplayWriter;
 import mage.collectors.services.PrintGameLogsDataCollector;
 import mage.collectors.services.SaveGameHistoryDataCollector;
 import mage.game.Game;
 import mage.game.Table;
+import mage.game.events.GameEvent;
 import mage.players.Player;
 import org.apache.log4j.Logger;
+
+import mage.target.Target;
 
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -52,6 +57,7 @@ final public class DataCollectorServices implements DataCollector {
         // fill all possible services
         getInstance().allServices.add(new PrintGameLogsDataCollector());
         getInstance().allServices.add(new SaveGameHistoryDataCollector());
+        getInstance().allServices.add(new StaxReplayWriter());
         logger.info(String.format("Data collectors: found %d services", getInstance().allServices.size()));
 
         // enable only needed
@@ -89,6 +95,10 @@ final public class DataCollectorServices implements DataCollector {
         throw new IllegalStateException("Wrong code usage. Use it by static methods only");
     }
 
+    /* ------------------------------------------------------------------
+     * Server / table lifecycle
+     * ------------------------------------------------------------------ */
+
     @Override
     public void onServerStart() {
         activeServices.forEach(DataCollector::onServerStart);
@@ -104,10 +114,20 @@ final public class DataCollectorServices implements DataCollector {
         activeServices.forEach(c -> c.onTableEnd(table));
     }
 
+    /* ------------------------------------------------------------------
+     * Game lifecycle
+     * ------------------------------------------------------------------ */
+
     @Override
     public void onGameStart(Game game) {
         if (game.isSimulation()) return;
         activeServices.forEach(c -> c.onGameStart(game));
+    }
+
+    @Override
+    public void onGameReady(Game game) {
+        if (game.isSimulation()) return;
+        activeServices.forEach(c -> c.onGameReady(game));
     }
 
     @Override
@@ -117,10 +137,118 @@ final public class DataCollectorServices implements DataCollector {
     }
 
     @Override
+    public void onGameEvent(Game game, GameEvent event) {
+        if (game.isSimulation()) return;
+        activeServices.forEach(c -> c.onGameEvent(game, event));
+    }
+
+    @Override
     public void onGameEnd(Game game) {
         if (game.isSimulation()) return;
         activeServices.forEach(c -> c.onGameEnd(game));
     }
+
+    /* ------------------------------------------------------------------
+     * Turn / step flow
+     * ------------------------------------------------------------------ */
+
+    @Override
+    public void onTurnBegin(Game game) {
+        if (game.isSimulation()) return;
+        activeServices.forEach(c -> c.onTurnBegin(game));
+    }
+
+    @Override
+    public void onTurnEnd(Game game) {
+        if (game.isSimulation()) return;
+        activeServices.forEach(c -> c.onTurnEnd(game));
+    }
+
+    @Override
+    public void onStepBegin(Game game) {
+        if (game.isSimulation()) return;
+        activeServices.forEach(c -> c.onStepBegin(game));
+    }
+
+    @Override
+    public void onStepEnd(Game game) {
+        if (game.isSimulation()) return;
+        activeServices.forEach(c -> c.onStepEnd(game));
+    }
+
+    /* ------------------------------------------------------------------
+     * Player decisions
+     * ------------------------------------------------------------------ */
+
+    @Override
+    public void onMulliganDecision(Game game, UUID playerId, boolean keep) {
+        if (game.isSimulation()) return;
+        activeServices.forEach(c -> c.onMulliganDecision(game, playerId, keep));
+    }
+
+    @Override
+    public void onMulliganPutBack(Game game, UUID playerId, UUID cardId) {
+        if (game.isSimulation()) return;
+        activeServices.forEach(c -> c.onMulliganPutBack(game, playerId, cardId));
+    }
+
+    @Override
+    public void onOpeningHandAction(Game game, UUID playerId, UUID cardId) {
+        if (game.isSimulation()) return;
+        activeServices.forEach(c -> c.onOpeningHandAction(game, playerId, cardId));
+    }
+
+    @Override
+    public void onPlayerPass(Game game, UUID playerId) {
+        if (game.isSimulation()) return;
+        activeServices.forEach(c -> c.onPlayerPass(game, playerId));
+    }
+
+    @Override
+    public void onChooseUse(Game game, Player player, boolean choice) {
+        if (game.isSimulation()) return;
+        activeServices.forEach(c -> c.onChooseUse(game, player, choice));
+    }
+
+    @Override
+    public void onChooseRandom(Game game, Player player, Card card) {
+        if (game.isSimulation()) return;
+        activeServices.forEach(c -> c.onChooseRandom(game, player, card));
+    }
+
+    @Override
+    public void onCardsRevealed(Game game, Player player, mage.cards.Cards cards) {
+        if (game.isSimulation()) return;
+        activeServices.forEach(c -> c.onCardsRevealed(game, player, cards));
+    }
+
+    @Override
+    public void onCardsLookedAt(Game game, Player player, mage.cards.Cards cards) {
+        if (game.isSimulation()) return;
+        activeServices.forEach(c -> c.onCardsLookedAt(game, player, cards));
+    }
+
+    @Override
+    public void onTopCardMayHaveChanged(Game game, Player player) {
+        if (game.isSimulation()) return;
+        activeServices.forEach(c -> c.onTopCardMayHaveChanged(game, player));
+    }
+
+    @Override
+    public void onChoose(Game game, Player player, Target target, mage.constants.ChooseKind kind) {
+        if (game.isSimulation()) return;
+        activeServices.forEach(c -> c.onChoose(game, player, target, kind));
+    }
+
+    @Override
+    public void onChoose(Game game, Player player, mage.choices.Choice choice, mage.constants.ChooseKind kind) {
+        if (game.isSimulation()) return;
+        activeServices.forEach(c -> c.onChoose(game, player, choice, kind));
+    }
+
+    /* ------------------------------------------------------------------
+     * Chat
+     * ------------------------------------------------------------------ */
 
     @Override
     public void onChatRoom(UUID roomId, String userName, String message) {
@@ -142,10 +270,26 @@ final public class DataCollectorServices implements DataCollector {
         activeServices.forEach(c -> c.onChatGame(gameId, userName, message));
     }
 
+    /* ------------------------------------------------------------------
+     * Tests only
+     * ------------------------------------------------------------------ */
+
     @Override
-    public void onTestsChoiceUse(Game game, Player player, String usingChoice, String reason) {
+    public void onTestsChoiceUse(Game game, Player player, String source, String usingChoice) {
         if (game.isSimulation()) return;
-        activeServices.forEach(c -> c.onTestsChoiceUse(game, player, usingChoice, reason));
+        activeServices.forEach(c -> c.onTestsChoiceUse(game, player, source, usingChoice));
+    }
+
+    @Override
+    public void onTestsChoiceUse(Game game, Player player, String source, Target target) {
+        if (game.isSimulation()) return;
+        activeServices.forEach(c -> c.onTestsChoiceUse(game, player, source, target));
+    }
+
+    @Override
+    public void onTestsChoiceUse(Game game, Player player, String source, mage.cards.Card card) {
+        if (game.isSimulation()) return;
+        activeServices.forEach(c -> c.onTestsChoiceUse(game, player, source, card));
     }
 
     @Override

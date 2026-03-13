@@ -1,8 +1,13 @@
 package mage.collectors;
 
+import mage.cards.Card;
+import mage.cards.Cards;
 import mage.game.Game;
 import mage.game.Table;
+import mage.game.events.GameEvent;
 import mage.players.Player;
+
+import mage.target.Target;
 
 import java.util.UUID;
 
@@ -43,17 +48,77 @@ public interface DataCollector {
      */
     String getInitInfo();
 
+    /* ------------------------------------------------------------------
+     * Server / table lifecycle
+     * ------------------------------------------------------------------ */
+
     void onServerStart();
 
     void onTableStart(Table table);
 
     void onTableEnd(Table table);
 
+    /* ------------------------------------------------------------------
+     * Game lifecycle
+     * ------------------------------------------------------------------ */
+
     void onGameStart(Game game);
+
+    void onGameReady(Game game);
 
     void onGameLog(Game game, String message);
 
+    void onGameEvent(Game game, GameEvent event);
+
     void onGameEnd(Game game);
+
+    /* ------------------------------------------------------------------
+     * Turn / step flow
+     * ------------------------------------------------------------------ */
+
+    void onTurnBegin(Game game);
+
+    void onTurnEnd(Game game);
+
+    void onStepBegin(Game game);
+
+    void onStepEnd(Game game);
+
+    /* ------------------------------------------------------------------
+     * Player decisions
+     * ------------------------------------------------------------------ */
+
+    void onMulliganDecision(Game game, UUID playerId, boolean keep);
+
+    void onMulliganPutBack(Game game, UUID playerId, UUID cardId);
+
+    /**
+     * On opening hand action (e.g. leyline placement from hand to battlefield)
+     */
+    void onOpeningHandAction(Game game, UUID playerId, UUID cardId);
+
+    void onPlayerPass(Game game, UUID playerId);
+
+    void onChooseUse(Game game, Player player, boolean choice);
+
+    void onChooseRandom(Game game, Player player, Card card);
+
+    /**
+     * On a player revealing cards (e.g. Polymorph library iteration)
+     */
+    void onCardsRevealed(Game game, Player player, mage.cards.Cards cards);
+
+    void onCardsLookedAt(Game game, Player player, mage.cards.Cards cards);
+
+    void onTopCardMayHaveChanged(Game game, Player player);
+
+    void onChoose(Game game, Player player, Target target, mage.constants.ChooseKind kind);
+
+    void onChoose(Game game, Player player, mage.choices.Choice choice, mage.constants.ChooseKind kind);
+
+    /* ------------------------------------------------------------------
+     * Chat
+     * ------------------------------------------------------------------ */
 
     /**
      * @param userName can be null for system messages
@@ -69,13 +134,28 @@ public interface DataCollector {
      */
     void onChatGame(UUID gameId, String userName, String message);
 
+    /* ------------------------------------------------------------------
+     * Tests only
+     * ------------------------------------------------------------------ */
+
     /**
      * Tests only: on any non-target choice like yes/no, mode, etc
      */
-    void onTestsChoiceUse(Game game, Player player, String usingChoice, String reason);
+    void onTestsChoiceUse(Game game, Player player, String source, String usingChoice);
 
     /**
-     * Tests only: on any target choice
+     * Tests only: on a target-based choice (e.g. sacrifice, searchLibrary).
+     * Implementations resolve target UUIDs to names internally.
+     */
+    void onTestsChoiceUse(Game game, Player player, String source, Target target);
+
+    /**
+     * Tests only: on a card-based choice (e.g. random card from hand).
+     */
+    void onTestsChoiceUse(Game game, Player player, String source, mage.cards.Card card);
+
+    /**
+     * Tests only: on a target being selected (e.g. by cast/activate or addTarget command).
      */
     void onTestsTargetUse(Game game, Player player, String usingTarget, String reason);
 

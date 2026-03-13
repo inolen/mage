@@ -64,7 +64,7 @@ class WildEvocationEffect extends OneShotEffect {
         MageObject sourceObject = source.getSourceObject(game);
         if (player != null 
                 && sourceObject != null) {
-            Card card = player.getHand().getRandom(game);
+            Card card = player.chooseRandomCard(player.getHand(), game);
             if (card != null) {
                 Cards cards = new CardsImpl(card);
                 player.revealCards(sourceObject.getIdName() + " Turn: " 

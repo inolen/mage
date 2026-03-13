@@ -1,5 +1,6 @@
 package mage.game.turn;
 
+import mage.collectors.DataCollectorServices;
 import mage.constants.PhaseStep;
 import mage.constants.TurnPhase;
 import mage.game.Game;
@@ -200,6 +201,7 @@ public abstract class Phase implements Serializable {
     protected void playStep(Game game) {
         if (!currentStep.skipStep(game, activePlayerId)) {
             game.getState().increaseStepNum();
+            DataCollectorServices.getInstance().onStepBegin(game);
             prePriority(game, activePlayerId);
             if (!game.isPaused() && !game.checkIfGameIsOver() && !game.executingRollback()) {
                 currentStep.priority(game, activePlayerId, false);
@@ -210,6 +212,7 @@ public abstract class Phase implements Serializable {
             if (!game.isPaused() && !game.checkIfGameIsOver() && !game.executingRollback()) {
                 postPriority(game, activePlayerId);
             }
+            DataCollectorServices.getInstance().onStepEnd(game);
         }
     }
 

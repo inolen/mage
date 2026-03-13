@@ -38,6 +38,7 @@ import mage.util.Copyable;
 import mage.util.ThreadLocalStringBuilder;
 import mage.watchers.Watcher;
 import mage.watchers.Watchers;
+import mage.collectors.DataCollectorServices;
 import org.apache.log4j.Logger;
 
 import java.io.Serializable;
@@ -1040,6 +1041,7 @@ public class GameState implements Serializable, Copyable<GameState> {
         watchers.watch(event, game);
         delayed.checkTriggers(event, game);
         triggers.checkTriggers(event, game);
+        DataCollectorServices.getInstance().onGameEvent(game, event);
     }
 
     public boolean replaceEvent(GameEvent event, Game game) {

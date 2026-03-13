@@ -1,11 +1,16 @@
 package mage.collectors.services;
 
+import mage.cards.Card;
 import mage.game.Game;
+import mage.game.permanent.Permanent;
 import mage.players.Player;
+import mage.target.Target;
 import mage.util.CardUtil;
 import mage.util.ConsoleUtil;
 import org.apache.log4j.Logger;
 import org.jsoup.Jsoup;
+
+import java.util.UUID;
 
 /**
  * Data collector to print game logs in console output. Used for better unit tests debugging.
@@ -49,14 +54,33 @@ public class PrintGameLogsDataCollector extends EmptyDataCollector {
     }
 
     @Override
-    public void onTestsChoiceUse(Game game, Player player, String choice, String reason) {
-        String needReason = Jsoup.parse(reason).text();
-        writeLog("LOG", "GAME", ConsoleUtil.asYellow(String.format("%s: %s using choice: %s%s",
+    public void onTestsChoiceUse(Game game, Player player, String source, String choice) {
+        writeLog("LOG", "GAME", ConsoleUtil.asYellow(String.format("%s: %s using choice: %s (%s)",
                 CardUtil.getTurnInfo(game),
                 player.getName(),
                 choice,
-                reason.isEmpty() ? "" : " (" + needReason + ")"
+                source
         )));
+    }
+
+    @Override
+    public void onTestsChoiceUse(Game game, Player player, String source, Target target) {
+        for (UUID targetId : target.getTargets()) {
+            Permanent perm = game.getPermanent(targetId);
+            if (perm != null) {
+                onTestsChoiceUse(game, player, source, perm.getName());
+            } else {
+                Player p = game.getPlayer(targetId);
+                if (p != null) {
+                    onTestsChoiceUse(game, player, source, p.getName());
+                } else {
+                    Card card = game.getCard(targetId);
+                    if (card != null) {
+                        onTestsChoiceUse(game, player, source, card.getName());
+                    }
+                }
+            }
+        }
     }
 
     @Override

@@ -74,7 +74,7 @@ class ScytheSpecterEffect extends OneShotEffect {
                 Player opponent = game.getPlayer(playerId);
                 if (opponent != null) {
                     Target target = new TargetDiscard(new FilterCard(), playerId);
-                    opponent.chooseTarget(Outcome.Discard, target, source, game);
+                    target.choose(Outcome.Discard, playerId, source, game);
                     Card targetCard = game.getCard(target.getFirstTarget());
                     if (targetCard != null) {
                         currentCMC = targetCard.getManaValue();

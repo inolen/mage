@@ -70,7 +70,7 @@ class StrongarmTacticsEffect extends OneShotEffect {
                 if (player != null) {
                     int numberOfCardsToDiscard = Math.min(1, player.getHand().size());
                     Target target = new TargetDiscard(numberOfCardsToDiscard, numberOfCardsToDiscard, new FilterCard(), playerId);
-                    player.chooseTarget(outcome, target, source, game);
+                    target.choose(Outcome.Discard, playerId, source, game);
                     Cards cards = new CardsImpl();
                     cards.addAll(target.getTargets());
                     cardsToDiscard.put(playerId, cards);

@@ -114,7 +114,7 @@ class AclazotzDeepestBetrayalEffect extends OneShotEffect {
             int numberOfCardsToDiscard = Math.min(1, player.getHand().size());
             Cards cards = new CardsImpl();
             Target target = new TargetDiscard(numberOfCardsToDiscard, numberOfCardsToDiscard, StaticFilters.FILTER_CARD, playerId);
-            player.chooseTarget(outcome, target, source, game);
+            target.choose(Outcome.Discard, playerId, source, game);
             cards.addAll(target.getTargets());
             cardsToDiscard.put(playerId, cards);
         }

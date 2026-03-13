@@ -45,11 +45,11 @@ public class PlayWithTheTopCardRevealedEffect extends ContinuousEffectImpl {
                 for (UUID playerId : game.getState().getPlayersInRange(controller.getId(), game)) {
                     Player player = game.getPlayer(playerId);
                     if (player != null && canLookAtNextTopLibraryCard(game)) {
-                        player.setTopCardRevealed(true);
+                        player.setTopCardRevealed(true, game);
                     }
                 }
             } else if (canLookAtNextTopLibraryCard(game)) {
-                controller.setTopCardRevealed(true);
+                controller.setTopCardRevealed(true, game);
             }
             return true;
         }

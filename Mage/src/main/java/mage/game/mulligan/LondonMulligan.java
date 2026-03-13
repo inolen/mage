@@ -1,6 +1,7 @@
 package mage.game.mulligan;
 
 import mage.cards.CardsImpl;
+import mage.collectors.DataCollectorServices;
 import mage.constants.Outcome;
 import mage.filter.FilterCard;
 import mage.game.Game;
@@ -112,6 +113,9 @@ public class LondonMulligan extends Mulligan {
         while (player.canRespond() && player.getHand().size() > newHandSize) {
             Target target = new TargetCardInHand(new FilterCard("card (" + (player.getHand().size() - newHandSize) + " more) to put on the bottom of your library"));
             player.chooseTarget(Outcome.Discard, target, null, game);
+            for (UUID cardId : target.getTargets()) {
+                DataCollectorServices.getInstance().onMulliganPutBack(game, playerId, cardId);
+            }
             player.putCardsOnBottomOfLibrary(new CardsImpl(target.getTargets()), game, null, true);
         }
     }

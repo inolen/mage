@@ -1,5 +1,6 @@
 package mage.game.mulligan;
 
+import mage.collectors.DataCollectorServices;
 import mage.game.Game;
 import mage.game.events.GameEvent;
 import mage.players.Player;
@@ -58,6 +59,7 @@ public abstract class Mulligan implements Serializable {
                             break;
                         }
                     }
+                    DataCollectorServices.getInstance().onMulliganDecision(game, playerId, keep);
                     if (keep) {
                         game.endMulligan(player.getId());
                         keepPlayers.add(playerId);

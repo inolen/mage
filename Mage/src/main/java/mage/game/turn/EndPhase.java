@@ -2,6 +2,7 @@
 
 package mage.game.turn;
 
+import mage.collectors.DataCollectorServices;
 import mage.constants.PhaseStep;
 import mage.constants.TurnPhase;
 import mage.game.Game;
@@ -30,6 +31,7 @@ public class EndPhase extends Phase {
         if (currentStep.getType() == PhaseStep.CLEANUP) {
             game.getState().increaseStepNum();
             game.getTurn().setEndTurnRequested(false); // so triggers trigger again
+            DataCollectorServices.getInstance().onStepBegin(game);
             prePriority(game, activePlayerId);
 
             // 514.3.
@@ -56,6 +58,7 @@ public class EndPhase extends Phase {
             if (!game.isPaused() && !game.checkIfGameIsOver() && !game.executingRollback()) {
                 postPriority(game, activePlayerId);
             }
+            DataCollectorServices.getInstance().onStepEnd(game);
         } else {
             super.playStep(game);
         }

@@ -64,7 +64,7 @@ public class LookLibraryControllerEffect extends OneShotEffect {
 
         // take cards from library and look at them
         boolean topCardRevealed = controller.isTopCardRevealed();
-        controller.setTopCardRevealed(false);
+        controller.setTopCardRevealed(false, game);
         Cards cards = new CardsImpl(controller.getLibrary().getTopCards(game, numberOfCards.calculate(game, source, this)));
 
         if (revealCards) {
@@ -75,7 +75,7 @@ public class LookLibraryControllerEffect extends OneShotEffect {
 
         boolean result = actionWithLookedCards(game, source, controller, cards);
 
-        controller.setTopCardRevealed(topCardRevealed);
+        controller.setTopCardRevealed(topCardRevealed, game);
 
         return result;
     }

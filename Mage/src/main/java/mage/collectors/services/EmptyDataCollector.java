@@ -1,9 +1,12 @@
 package mage.collectors.services;
 
+import mage.cards.Card;
 import mage.collectors.DataCollector;
 import mage.game.Game;
 import mage.game.Table;
+import mage.game.events.GameEvent;
 import mage.players.Player;
+import mage.target.Target;
 
 import java.util.UUID;
 
@@ -18,6 +21,10 @@ public abstract class EmptyDataCollector implements DataCollector {
     public String getInitInfo() {
         return "";
     }
+
+    /* ------------------------------------------------------------------
+     * Server / table lifecycle
+     * ------------------------------------------------------------------ */
 
     @Override
     public void onServerStart() {
@@ -34,8 +41,17 @@ public abstract class EmptyDataCollector implements DataCollector {
         // nothing
     }
 
+    /* ------------------------------------------------------------------
+     * Game lifecycle
+     * ------------------------------------------------------------------ */
+
     @Override
     public void onGameStart(Game game) {
+        // nothing
+    }
+
+    @Override
+    public void onGameReady(Game game) {
         // nothing
     }
 
@@ -45,9 +61,101 @@ public abstract class EmptyDataCollector implements DataCollector {
     }
 
     @Override
+    public void onGameEvent(Game game, GameEvent event) {
+        // nothing
+    }
+
+    @Override
     public void onGameEnd(Game game) {
         // nothing
     }
+
+    /* ------------------------------------------------------------------
+     * Turn / step flow
+     * ------------------------------------------------------------------ */
+
+    @Override
+    public void onTurnBegin(Game game) {
+        // nothing
+    }
+
+    @Override
+    public void onTurnEnd(Game game) {
+        // nothing
+    }
+
+    @Override
+    public void onStepBegin(Game game) {
+        // nothing
+    }
+
+    @Override
+    public void onStepEnd(Game game) {
+        // nothing
+    }
+
+    /* ------------------------------------------------------------------
+     * Player decisions
+     * ------------------------------------------------------------------ */
+
+    @Override
+    public void onMulliganDecision(Game game, UUID playerId, boolean keep) {
+        // nothing
+    }
+
+    @Override
+    public void onMulliganPutBack(Game game, UUID playerId, UUID cardId) {
+        // nothing
+    }
+
+    @Override
+    public void onOpeningHandAction(Game game, UUID playerId, UUID cardId) {
+        // nothing
+    }
+
+    @Override
+    public void onPlayerPass(Game game, UUID playerId) {
+        // nothing
+    }
+
+    @Override
+    public void onChooseUse(Game game, Player player, boolean choice) {
+        // nothing
+    }
+
+    @Override
+    public void onChooseRandom(Game game, Player player, Card card) {
+        // nothing
+    }
+
+    @Override
+    public void onCardsRevealed(Game game, Player player, mage.cards.Cards cards) {
+        // nothing
+    }
+
+    @Override
+    public void onCardsLookedAt(Game game, Player player, mage.cards.Cards cards) {
+        // nothing
+    }
+
+    @Override
+    public void onTopCardMayHaveChanged(Game game, Player player) {
+        // nothing
+    }
+
+    @Override
+    public void onChoose(Game game, Player player, Target target, mage.constants.ChooseKind kind) {
+        // nothing
+    }
+
+    @Override
+    public void onChoose(Game game, Player player, mage.choices.Choice choice, mage.constants.ChooseKind kind) {
+        // nothing
+    }
+
+    /* ------------------------------------------------------------------
+     * Chat
+     * ------------------------------------------------------------------ */
 
     @Override
     public void onChatRoom(UUID roomId, String userName, String message) {
@@ -69,8 +177,22 @@ public abstract class EmptyDataCollector implements DataCollector {
         // nothing
     }
 
+    /* ------------------------------------------------------------------
+     * Tests only
+     * ------------------------------------------------------------------ */
+
     @Override
-    public void onTestsChoiceUse(Game game, Player player, String usingChoice, String reason) {
+    public void onTestsChoiceUse(Game game, Player player, String source, String usingChoice) {
+        // nothing
+    }
+
+    @Override
+    public void onTestsChoiceUse(Game game, Player player, String source, Target target) {
+        // nothing
+    }
+
+    @Override
+    public void onTestsChoiceUse(Game game, Player player, String source, mage.cards.Card card) {
         // nothing
     }
 

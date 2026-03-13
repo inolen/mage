@@ -3,6 +3,7 @@ package mage.target;
 import mage.MageObject;
 import mage.abilities.Ability;
 import mage.cards.Cards;
+import mage.collectors.DataCollectorServices;
 import mage.constants.Outcome;
 import mage.game.Game;
 import mage.game.events.GameEvent;
@@ -103,6 +104,12 @@ public class Targets extends ArrayList<Target> implements Copyable<Targets> {
 
             // continue on nothing to choose or complete
             if (target.isChoiceSelected() || !target.canChoose(abilityControllerId, source, game)) {
+                // Emit data collector callbacks for pre-filled cost targets (e.g. sacrifice
+                // from AI simulation).  Skip spell/ability targets (isTargetChoice) since those
+                // are already captured in the cast/activate line's target syntax.
+                if (!isTargetChoice && target.isChoiceSelected() && !game.isSimulation()) {
+                    DataCollectorServices.getInstance().onChoose(game, player, target, mage.constants.ChooseKind.PAYMENT);
+                }
                 continue;
             }
 

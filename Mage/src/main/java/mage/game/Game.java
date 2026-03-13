@@ -824,4 +824,11 @@ public interface Game extends MageItem, Serializable, Copyable<Game> {
     UUID getTableId();
 
     void setTableId(UUID tableId);
+
+    /**
+     * Get a random int from the game's seeded RNG. Use this instead of
+     * RandomUtil.nextInt() for game-meaningful random effects (coin flips,
+     * Capricious Efreet, etc.) so that replays are deterministic.
+     */
+    int getGameRandomInt(int bound);
 }

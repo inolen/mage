@@ -91,7 +91,7 @@ class InquisitorEisenhornReplacementEffect extends ReplacementEffectImpl {
         }
 
         // reveal
-        controller.setTopCardRevealed(true);
+        controller.setTopCardRevealed(true, game);
 
         return false;
     }

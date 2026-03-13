@@ -117,7 +117,7 @@ class BanditsTalentDiscardEffect extends OneShotEffect {
                             numberOfCardsToDiscard, numberOfCardsToDiscard,
                             StaticFilters.FILTER_CARD, playerId
                     );
-                    targetPlayer.chooseTarget(outcome, target, source, game);
+                    target.choose(Outcome.Discard, playerId, source, game);
                     cards.addAll(target.getTargets());
                 } else {
                     //Discard a nonland
@@ -125,7 +125,7 @@ class BanditsTalentDiscardEffect extends OneShotEffect {
                             1, 1,
                             StaticFilters.FILTER_CARD_NON_LAND, playerId
                     );
-                    targetPlayer.chooseTarget(outcome, target, source, game);
+                    target.choose(Outcome.Discard, playerId, source, game);
                     cards.addAll(target.getTargets());
                 }
                 cardsToDiscard.put(playerId, cards);

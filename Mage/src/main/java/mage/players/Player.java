@@ -314,7 +314,7 @@ public interface Player extends MageItem, Copyable<Player> {
 
     boolean isTopCardRevealed();
 
-    void setTopCardRevealed(boolean topCardRevealed);
+    void setTopCardRevealed(boolean topCardRevealed, Game game);
 
     /**
      * User's settings like avatar or skip buttons.
@@ -681,6 +681,8 @@ public interface Player extends MageItem, Copyable<Player> {
     boolean chooseTarget(Outcome outcome, Cards cards, TargetCard target, Ability source, Game game);
 
     boolean chooseTargetAmount(Outcome outcome, TargetAmount target, Ability source, Game game);
+
+    Card chooseRandomCard(Cards cards, Game game);
 
     boolean chooseMulligan(Game game);
 

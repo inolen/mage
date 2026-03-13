@@ -46,6 +46,11 @@ public class GameOptions implements Serializable, Copyable<GameOptions> {
     public boolean skipInitShuffling = false;
 
     /**
+     * If true, hands are drawn even in test mode (for replay data collection).
+     */
+    public boolean replayMode = false;
+
+    /**
      * If true, players can rollback turn if all players agree
      */
     public boolean rollbackTurnsAllowed = true;
@@ -82,6 +87,7 @@ public class GameOptions implements Serializable, Copyable<GameOptions> {
         this.stopOnTurn = options.stopOnTurn;
         this.stopAtStep = options.stopAtStep;
         this.skipInitShuffling = options.skipInitShuffling;
+        this.replayMode = options.replayMode;
         this.rollbackTurnsAllowed = options.rollbackTurnsAllowed;
         this.bannedUsers.addAll(options.bannedUsers);
         this.planeChase = options.planeChase;

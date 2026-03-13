@@ -115,12 +115,12 @@ public class ComputerPlayer extends PlayerImpl {
     }
 
     @Override
-    public boolean choose(Outcome outcome, Target target, Ability source, Game game) {
-        return choose(outcome, target, source, game, null);
+    protected boolean doChoose(Outcome outcome, Target target, Ability source, Game game) {
+        return doChoose(outcome, target, source, game, null);
     }
 
     @Override
-    public boolean choose(Outcome outcome, Target target, Ability source, Game game, Map<String, Serializable> options) {
+    protected boolean doChoose(Outcome outcome, Target target, Ability source, Game game, Map<String, Serializable> options) {
         return makeChoice(outcome, target, source, game, null);
     }
 
@@ -217,7 +217,7 @@ public class ComputerPlayer extends PlayerImpl {
     }
 
     @Override
-    public boolean chooseTarget(Outcome outcome, Target target, Ability source, Game game) {
+    protected boolean doChooseTarget(Outcome outcome, Target target, Ability source, Game game) {
         return makeChoice(outcome, target, source, game, null);
     }
 
@@ -764,12 +764,7 @@ public class ComputerPlayer extends PlayerImpl {
     }
 
     @Override
-    public boolean chooseUse(Outcome outcome, String message, Ability source, Game game) {
-        return chooseUse(outcome, message, null, null, null, source, game);
-    }
-
-    @Override
-    public boolean chooseUse(Outcome outcome, String message, String secondMessage, String trueText, String falseText, Ability source, Game game) {
+    protected boolean doChooseUse(Outcome outcome, String message, String secondMessage, String trueText, String falseText, Ability source, Game game) {
         // Be proactive! Always use abilities, the evaluation function will decide if it's good or not
         // Otherwise some abilities won't be used by AI like LoseTargetEffect that has "bad" outcome
         // but still is good when targets opponent
@@ -777,7 +772,7 @@ public class ComputerPlayer extends PlayerImpl {
     }
 
     @Override
-    public boolean choose(Outcome outcome, Choice choice, Game game) {
+    protected boolean doChoose(Outcome outcome, Choice choice, Game game) {
         //TODO: improve this
 
         // choose creature type
@@ -885,12 +880,12 @@ public class ComputerPlayer extends PlayerImpl {
     }
 
     @Override
-    public boolean chooseTarget(Outcome outcome, Cards cards, TargetCard target, Ability source, Game game) {
+    protected boolean doChooseTarget(Outcome outcome, Cards cards, TargetCard target, Ability source, Game game) {
         return makeChoice(outcome, target, source, game, cards);
     }
 
     @Override
-    public boolean choose(Outcome outcome, Cards cards, TargetCard target, Ability source, Game game) {
+    protected boolean doChoose(Outcome outcome, Cards cards, TargetCard target, Ability source, Game game) {
         return makeChoice(outcome, target, source, game, cards);
     }
 

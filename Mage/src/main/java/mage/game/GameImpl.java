@@ -1061,6 +1061,7 @@ public abstract class GameImpl implements Game {
         DataCollectorServices.getInstance().onGameStart(this);
         if (state.getPlayers().values().iterator().hasNext()) {
             init(choosingPlayerId);
+            DataCollectorServices.getInstance().onGameReady(this);
             play(startingPlayerId);
         }
     }
@@ -1351,7 +1352,7 @@ public abstract class GameImpl implements Game {
             if (!gameOptions.testMode || player.getLife() == 0) {
                 player.initLife(this.getStartingLife());
             }
-            if (!gameOptions.testMode) {
+            if (!gameOptions.testMode || gameOptions.replayMode) {
                 mulligan.drawHand(startingHandSize, player, this);
             }
         }
@@ -1390,6 +1391,7 @@ public abstract class GameImpl implements Game {
                             OpeningHandAction action = (OpeningHandAction) ability;
                             if (action.askUseOpeningHandAction(card, player, this)) {
                                 action.doOpeningHandAction(card, player, this);
+                                DataCollectorServices.getInstance().onOpeningHandAction(this, player.getId(), card.getId());
                             }
                         }
 
@@ -1752,6 +1754,10 @@ public abstract class GameImpl implements Game {
                                 }
                             }
                             resuming = false;
+                        }
+                        // notify data collectors that this player passed priority
+                        if (player.isPassed() && player.canRespond()) {
+                            DataCollectorServices.getInstance().onPlayerPass(this, player.getId());
                         }
                         resetShortLivingLKI();
                         resuming = false;
@@ -4218,6 +4224,9 @@ public abstract class GameImpl implements Game {
     @Override
     public void setGameStopped(boolean gameStopped) {
         this.gameStopped = gameStopped;
+        if (gameStopped) {
+            DataCollectorServices.getInstance().onGameEnd(this);
+        }
     }
 
     @Override
@@ -4267,5 +4276,10 @@ public abstract class GameImpl implements Game {
     @Override
     public void setTableId(UUID tableId) {
         this.tableId = tableId;
+    }
+
+    @Override
+    public int getGameRandomInt(int bound) {
+        return RandomUtil.nextInt(bound);
     }
 }

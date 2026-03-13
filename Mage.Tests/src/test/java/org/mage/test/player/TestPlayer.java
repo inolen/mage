@@ -3598,7 +3598,6 @@ public class TestPlayer implements Player {
         return computerPlayer.searchLibrary(target, source, game);
     }
 
-
     @Override
     public boolean searchLibrary(TargetCardInLibrary target, Ability source, Game game, UUID targetPlayerId) {
         return computerPlayer.searchLibrary(target, source, game, targetPlayerId);
@@ -3735,8 +3734,8 @@ public class TestPlayer implements Player {
     }
 
     @Override
-    public void setTopCardRevealed(boolean topCardRevealed) {
-        computerPlayer.setTopCardRevealed(topCardRevealed);
+    public void setTopCardRevealed(boolean topCardRevealed, Game game) {
+        computerPlayer.setTopCardRevealed(topCardRevealed, game);
     }
 
     @Override
@@ -4310,6 +4309,16 @@ public class TestPlayer implements Player {
 
         this.chooseStrictModeFailed("target", game, getInfo(source, game) + "\n" + getInfo(target, source, game, null));
         return computerPlayer.chooseTargetAmount(outcome, target, source, game);
+    }
+
+    @Override
+    public Card chooseRandomCard(Cards cards, Game game) {
+        return computerPlayer.chooseRandomCard(cards, game);
+    }
+
+    @Override
+    public Card chooseRandomCard(Cards cards, Game game, mage.constants.ChooseContext context) {
+        return computerPlayer.chooseRandomCard(cards, game, context);
     }
 
     @Override

@@ -2452,6 +2452,10 @@ public abstract class CardTestPlayerAPIImpl extends MageTestPlayerBase implement
         gameOptions.skipInitShuffling = true;
     }
 
+    protected void enableReplayMode() {
+        gameOptions.replayMode = true;
+    }
+
     /**
      * Debug only: skip all choose commands after that command.
      * <p>

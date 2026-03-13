@@ -75,7 +75,7 @@ class MindBombEffect extends OneShotEffect {
             }
             Cards cards = new CardsImpl();
             Target target = new TargetDiscard(0, 3, new FilterCard(), playerId);
-            player.chooseTarget(Outcome.Discard, target, source, game);
+            target.choose(Outcome.Discard, playerId, source, game);
             cards.addAll(target.getTargets());
             cardsToDiscard.put(playerId, cards);
         }
