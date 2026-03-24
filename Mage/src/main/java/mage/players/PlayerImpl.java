@@ -1299,10 +1299,17 @@ public abstract class PlayerImpl implements Player, Serializable {
         if (game == null || originalAbility == null) {
             return false;
         }
-
         // Use ability copy to avoid problems with targets and costs on recast (issue https://github.com/magefree/mage/issues/5189).
         SpellAbility ability = originalAbility.copy();
         Set<MageIdentifier> allowedIdentifiers = originalAbility.spellCanBeActivatedNow(getId(), game);
+        DataCollectorServices.getInstance().onBeginCastSpell(game, this, ability, approvingObject);
+        boolean success = doCast(ability, game, allowedIdentifiers, noMana, approvingObject);
+        DataCollectorServices.getInstance().onEndCastSpell(game, this, success);
+        return success;
+    }
+
+    private boolean doCast(SpellAbility ability, Game game, Set<MageIdentifier> allowedIdentifiers,
+                           boolean noMana, ApprovingObject approvingObject) {
         ability.setControllerId(getId());
         ability.initSourceObjectZoneChangeCounter(game, true);
 
@@ -1540,6 +1547,13 @@ public abstract class PlayerImpl implements Player, Serializable {
     }
 
     protected boolean playAbility(ActivatedAbility ability, Game game) {
+        DataCollectorServices.getInstance().onBeginActivateAbility(game, this, ability);
+        boolean success = doPlayAbility(ability, game);
+        DataCollectorServices.getInstance().onEndActivateAbility(game, this, success);
+        return success;
+    }
+
+    private boolean doPlayAbility(ActivatedAbility ability, Game game) {
         //20091005 - 602.2a
         int bookmark = game.bookmarkState();
         if (ability.isUsesStack()) {

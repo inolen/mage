@@ -104,6 +104,16 @@ public interface DataCollector {
     void onChooseRandom(Game game, Player player, Card card, mage.constants.ChooseContext context);
 
     /**
+     * Bracket around PlayerImpl.playAbility so data collectors can distinguish
+     * choices made during cost payment from choices made at other times.
+     */
+    void onBeginActivateAbility(Game game, Player player, mage.abilities.ActivatedAbility ability);
+    void onEndActivateAbility(Game game, Player player, boolean success);
+
+    void onBeginCastSpell(Game game, Player player, mage.abilities.SpellAbility ability, mage.ApprovingObject approvingObject);
+    void onEndCastSpell(Game game, Player player, boolean success);
+
+    /**
      * On a player revealing cards (e.g. Polymorph library iteration)
      */
     void onCardsRevealed(Game game, Player player, mage.cards.Cards cards);

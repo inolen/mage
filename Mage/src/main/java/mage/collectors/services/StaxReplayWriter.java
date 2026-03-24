@@ -125,7 +125,10 @@ public class StaxReplayWriter extends EmptyDataCollector {
     private final Map<UUID, Integer> cardInstanceMap = new HashMap<>();
     private final Map<String, Integer> battlefieldInstanceCount = new HashMap<>();
     private final ArrayDeque<StaxEvent> pendingEvents = new ArrayDeque<>();
-    private final List<StaxEvent> deferredPaymentChoices = new ArrayList<>();
+    private Ability currentAbility = null;
+    private String currentPlayerName = null;
+    private mage.ApprovingObject currentApprovingObject = null;
+    private final List<StaxEvent> abilityChoices = new ArrayList<>();
     private GameSnapshot lastSnapshot;
 
     public StaxReplayWriter() {
@@ -617,11 +620,9 @@ public class StaxReplayWriter extends EmptyDataCollector {
     public void onGameEvent(Game game, GameEvent event) {
         switch (event.getType()) {
             case LAND_PLAYED:        handleLandPlayed(game, event); break;
-            case SPELL_CAST:         handleSpellCast(game, event); break;
             case MANA_ADDED:         handleManaAdded(game, event); break;
             case ATTACKER_DECLARED:  handleAttackerDeclared(game, event); break;
             case BLOCKER_DECLARED:   handleBlockerDeclared(game, event); break;
-            case ACTIVATED_ABILITY:  handleActivatedAbility(game, event); break;
             case TRIGGERED_ABILITY:  handleTriggeredAbility(game, event); break;
             case DREW_CARD:          handleDrewCard(game, event); break;
             case CREATED_TOKEN:      handleCreatedToken(game, event); break;
@@ -637,43 +638,10 @@ public class StaxReplayWriter extends EmptyDataCollector {
         pushAction(StaxEventType.PLAY_LAND, player, card);
     }
 
-    private void handleSpellCast(Game game, GameEvent event) {
-        // Effect-driven casts (e.g. Wild Evocation) are not player decisions;
-        // suppress the cast entry but emit choose entries for any targets so the
-        // replay driver can answer ChooseTarget requests during the cast.
-        if (event.getApprovingObject() != null) {
-            StackObject stackObj = game.getStack().getStackObject(event.getTargetId());
-            if (stackObj != null) {
-                String player = requirePlayer(game, event.getPlayerId()).getName();
-                emitTargetChoices(game, stackObj, player);
-            }
-            return;
-        }
-
-        String player = requirePlayer(game, event.getPlayerId()).getName();
-        StackObject stackObj = requireStackObject(game, event.getTargetId());
-
-        String name;
-        String manaArgs = "";
-        String targets = "";
-
-        if (stackObj instanceof Spell) {
-            Spell spell = (Spell) stackObj;
-            name = spell.getName();
-            Mana usedMana = spell.getSpellAbility().getManaCostsToPay().getUsedManaToPay();
-            manaArgs = convertManaPaymentToArgs(usedMana);
-            targets = extractTargets(game, stackObj);
-        } else {
-            name = resolveCardName(game, event.getTargetId());
-        }
-
-        pushAction(StaxEventType.CAST_SPELL, player,
-                formatCardInstance(name, 0), manaArgs, targets);
-        pendingEvents.addAll(deferredPaymentChoices);
-        deferredPaymentChoices.clear();
-    }
-
     private void handleManaAdded(Game game, GameEvent event) {
+        if (currentAbility == null) {
+            throw new IllegalStateException("MANA_ADDED fired outside of playAbility/cast context");
+        }
         if (!(event instanceof ManaEvent)) {
             throw new IllegalStateException("MANA_ADDED event is not a ManaEvent");
         }
@@ -705,8 +673,6 @@ public class StaxReplayWriter extends EmptyDataCollector {
         }
 
         pushAction(StaxEventType.TAP_MANA, player, sourceRef, manaArg, "");
-        pendingEvents.addAll(deferredPaymentChoices);
-        deferredPaymentChoices.clear();
     }
 
     private int findManaAbilityIndex(Permanent source, Mana producedMana, Game game) {
@@ -758,32 +724,6 @@ public class StaxReplayWriter extends EmptyDataCollector {
         pushAction(StaxEventType.DECLARE_BLOCKER, player, blockerRef, "", attackerRef);
     }
 
-
-    private void handleActivatedAbility(Game game, GameEvent event) {
-        String player = requirePlayer(game, event.getPlayerId()).getName();
-        String sourceRef = formatCardInstance(resolveCardName(game, event.getSourceId()), cardInstance(event.getSourceId()));
-        String manaArgs = "";
-
-        StackObject stackObj = requireStackObject(game, event.getTargetId());
-        String targets = extractTargets(game, stackObj);
-
-        Map<String, Object> tags = stackObj.getStackAbility().getCostsTagMap();
-        if (tags != null && tags.containsKey("X")) {
-            Object xVal = tags.get("X");
-            if (xVal instanceof Number) {
-                manaArgs = String.format("{X:%d}", ((Number) xVal).intValue());
-            }
-        }
-
-        int abilityIndex = findAbilityIndex(game, event.getSourceId(), stackObj);
-        if (abilityIndex > 0) {
-            manaArgs = (manaArgs.isEmpty() ? "" : manaArgs + " ") + String.format("{IDX:%d}", abilityIndex);
-        }
-
-        pushAction(StaxEventType.ACTIVATE_ABILITY, player, sourceRef, manaArgs, targets);
-        pendingEvents.addAll(deferredPaymentChoices);
-        deferredPaymentChoices.clear();
-    }
 
     private int findAbilityIndex(Game game, UUID sourceId, StackObject stackObj) {
         Permanent perm = game.getPermanent(sourceId);
@@ -859,25 +799,109 @@ public class StaxReplayWriter extends EmptyDataCollector {
 
     // XMage's AI (ComputerPlayer7) picks actions by simulating future game states,
     // then replays the chosen action on the real game.  Targets selected during
-    // simulation are baked into the copied ability object as "pre-filled" targets.
-    // When the real game activates the ability, Targets.makeChoice() sees
-    // isChoiceSelected()==true and skips the normal Player.choose() call -- so our
-    // data-collector callback fires during cost payment, BEFORE the
-    // ACTIVATED_ABILITY / SPELL_CAST event.  We stash those choose entries in
-    // deferredPaymentChoices and drain them after the cast/activate/tap handler so
-    // they appear in the correct order in the replay file.
+    // When inside playAbility, choices (e.g. sacrifice targets) happen during
+    // cost payment BEFORE the ACTIVATED_ABILITY event fires.  Buffer them so
+    // they appear after the activate line in the replay file.
     private void pushChoose(String player, String ref, mage.constants.ChooseKind kind) {
-        if (kind == mage.constants.ChooseKind.PAYMENT) {
+        if (currentAbility != null) {
             StaxEvent se = new StaxEvent();
             se.type = StaxEventType.CHOOSE;
             se.player = player;
             se.arg = ref;
             se.manaArgs = "";
             se.targets = "";
-            deferredPaymentChoices.add(se);
+            abilityChoices.add(se);
         } else {
             pushAction(StaxEventType.CHOOSE, player, ref);
         }
+    }
+
+    @Override
+    public void onBeginActivateAbility(Game game, Player player, ActivatedAbility ability) {
+        currentAbility = ability;
+        currentPlayerName = player.getName();
+        abilityChoices.clear();
+    }
+
+    @Override
+    public void onEndActivateAbility(Game game, Player player, boolean success) {
+        if (success && currentAbility != null) {
+            String sourceRef = formatCardInstance(resolveCardName(game, currentAbility.getSourceId()), cardInstance(currentAbility.getSourceId()));
+            String manaArgs = "";
+            String targets = "";
+
+            StackObject stackObj = game.getStack().getStackObject(currentAbility.getId());
+            if (stackObj != null) {
+                targets = extractTargets(game, stackObj);
+
+                Map<String, Object> tags = stackObj.getStackAbility().getCostsTagMap();
+                if (tags != null && tags.containsKey("X")) {
+                    Object xVal = tags.get("X");
+                    if (xVal instanceof Number) {
+                        manaArgs = String.format("{X:%d}", ((Number) xVal).intValue());
+                    }
+                }
+
+                int abilityIndex = findAbilityIndex(game, currentAbility.getSourceId(), stackObj);
+                if (abilityIndex > 0) {
+                    manaArgs = (manaArgs.isEmpty() ? "" : manaArgs + " ") + String.format("{IDX:%d}", abilityIndex);
+                }
+            }
+
+            pushAction(StaxEventType.ACTIVATE_ABILITY, currentPlayerName, sourceRef, manaArgs, targets);
+            pendingEvents.addAll(abilityChoices);
+        }
+        currentAbility = null;
+        currentPlayerName = null;
+        abilityChoices.clear();
+    }
+
+    @Override
+    public void onBeginCastSpell(Game game, Player player, SpellAbility ability, mage.ApprovingObject approvingObject) {
+        currentAbility = ability;
+        currentPlayerName = player.getName();
+        currentApprovingObject = approvingObject;
+        abilityChoices.clear();
+    }
+
+    @Override
+    public void onEndCastSpell(Game game, Player player, boolean success) {
+        if (success && currentAbility != null) {
+            if (currentApprovingObject != null) {
+                // Effect-driven casts (e.g. Wild Evocation) are not player decisions;
+                // suppress the cast entry but emit choose entries for any targets so the
+                // replay driver can answer ChooseTarget requests during the cast.
+                StackObject stackObj = game.getStack().getStackObject(currentAbility.getId());
+                if (stackObj != null) {
+                    emitTargetChoices(game, stackObj, currentPlayerName);
+                }
+            } else {
+                StackObject stackObj = requireStackObject(game, currentAbility.getId());
+
+                String name;
+                String manaArgs = "";
+                String targets = "";
+
+                if (stackObj instanceof Spell) {
+                    Spell spell = (Spell) stackObj;
+                    name = spell.getName();
+                    Mana usedMana = spell.getSpellAbility().getManaCostsToPay().getUsedManaToPay();
+                    manaArgs = convertManaPaymentToArgs(usedMana);
+                    targets = extractTargets(game, spell);
+                } else {
+                    name = resolveCardName(game, currentAbility.getId());
+                }
+
+                pushAction(StaxEventType.CAST_SPELL, currentPlayerName,
+                        formatCardInstance(name, 0), manaArgs, targets);
+            }
+
+            pendingEvents.addAll(abilityChoices);
+        }
+        currentAbility = null;
+        currentPlayerName = null;
+        currentApprovingObject = null;
+        abilityChoices.clear();
     }
 
     @Override
