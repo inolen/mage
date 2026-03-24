@@ -211,9 +211,9 @@ final public class DataCollectorServices implements DataCollector {
     }
 
     @Override
-    public void onChooseRandom(Game game, Player player, Card card) {
+    public void onChooseRandom(Game game, Player player, Card card, mage.constants.ChooseContext context) {
         if (game.isSimulation()) return;
-        activeServices.forEach(c -> c.onChooseRandom(game, player, card));
+        activeServices.forEach(c -> c.onChooseRandom(game, player, card, context));
     }
 
     @Override

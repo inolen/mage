@@ -124,7 +124,7 @@ public abstract class EmptyDataCollector implements DataCollector {
     }
 
     @Override
-    public void onChooseRandom(Game game, Player player, Card card) {
+    public void onChooseRandom(Game game, Player player, Card card, mage.constants.ChooseContext context) {
         // nothing
     }
 

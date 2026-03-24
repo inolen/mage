@@ -74,7 +74,7 @@ class ThranTomeEffect extends OneShotEffect {
         controller.revealCards(source, cards, game);
 
         if (cards.size() == 1) {
-            cardToGraveyard = cards.getRandom(game);
+            cardToGraveyard = game.getCard(cards.iterator().next());
         } else {
             TargetCardInLibrary target = new TargetCardInLibrary(1, new FilterCard());
             opponent.chooseTarget(outcome, cards, target, source, game);

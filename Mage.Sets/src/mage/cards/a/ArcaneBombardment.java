@@ -88,7 +88,7 @@ class ArcaneBombardmentEffect extends OneShotEffect {
             return false;
         }
 
-        Card cardToExile = cardsInGraveyard.getRandom(game);
+        Card cardToExile = player.chooseRandomCard(cardsInGraveyard, game);
         if (cardToExile == null) {
             return false;
         }

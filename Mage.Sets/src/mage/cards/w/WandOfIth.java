@@ -61,7 +61,7 @@ class WandOfIthEffect extends OneShotEffect {
         Permanent sourcePermanent = game.getPermanentOrLKIBattlefield(source.getSourceId());
         if (player != null && !player.getHand().isEmpty()) {
             Cards revealed = new CardsImpl();
-            Card card = player.getHand().getRandom(game);
+            Card card = player.chooseRandomCard(player.getHand(), game);
             if (card != null) {
                 revealed.add(card);
                 player.revealCards(sourcePermanent.getName(), revealed, game);

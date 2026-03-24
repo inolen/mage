@@ -63,7 +63,7 @@ class RecklessHandlingEffect extends OneShotEffect {
         if (player == null || player.getHand().isEmpty()) {
             return false;
         }
-        Card card = player.discard(1, true, false, source, game).getRandom(game);
+        Card card = player.chooseRandomCard(player.discard(1, true, false, source, game), game);
         if (card == null || !card.isArtifact(game)) {
             return false;
         }

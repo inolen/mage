@@ -82,7 +82,7 @@ class GerrymanderingEffect extends OneShotEffect {
                 Player player = game.getPlayer(playerId);
                 if (player != null) {
                     for (int i = 1; i <= playerLandCount.get(playerId); i++) {
-                        Card card = exiledCards.getRandom(game);
+                        Card card = controller.chooseRandomCard(exiledCards, game);
                         exiledCards.remove(card);
                         player.moveCards(card, Zone.BATTLEFIELD, source, game, false, false, false, null);
                         if (exiledCards.isEmpty()) {

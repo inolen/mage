@@ -62,7 +62,7 @@ class DeadbridgeChantEffect extends OneShotEffect {
         Player controller = game.getPlayer(source.getControllerId());
         if (controller != null
                 && !controller.getGraveyard().isEmpty()) {
-            Card card = controller.getGraveyard().getRandom(game);
+            Card card = controller.chooseRandomCard(controller.getGraveyard(), game);
             if (card != null) {
                 Zone targetZone = Zone.HAND;
                 String text = " put into hand of ";

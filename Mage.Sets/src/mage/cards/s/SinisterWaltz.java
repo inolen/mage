@@ -62,7 +62,7 @@ class SinisterWaltzEffect extends OneShotEffect {
         Cards cards = new CardsImpl(getTargetPointer().getTargets(game, source));
         Card card;
         if (cards.size() > 2) {
-            card = cards.getRandom(game);
+            card = player.chooseRandomCard(cards, game);
             cards.remove(card);
         } else {
             card = null;

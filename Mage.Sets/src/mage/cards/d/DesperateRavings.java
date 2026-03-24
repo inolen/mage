@@ -64,7 +64,7 @@ class DesperateRavingsEffect extends OneShotEffect {
         if (player != null) {
             player.drawCards(2, source, game);
             Cards hand = player.getHand();
-            Card card = hand.getRandom(game);
+            Card card = player.chooseRandomCard(hand, game);
             player.discard(card, false, source, game);
             return true;
         }

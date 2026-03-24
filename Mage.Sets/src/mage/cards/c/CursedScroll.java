@@ -64,7 +64,7 @@ class CursedScrollEffect extends OneShotEffect {
         if (sourceObject != null && controller != null && cardName != null && !cardName.isEmpty()) {
             if (!controller.getHand().isEmpty()) {
                 Cards revealed = new CardsImpl();
-                Card card = controller.getHand().getRandom(game);
+                Card card = controller.chooseRandomCard(controller.getHand(), game);
                 if (card == null) {
                     return false;
                 }

@@ -116,7 +116,7 @@ class OmenpathJourneyChooseEffect extends OneShotEffect {
                 && exileZone != null
                 && !exileZone.isEmpty()
                 && player.moveCards(
-                exileZone.getRandom(game), Zone.BATTLEFIELD, source, game,
+                player.chooseRandomCard(exileZone, game), Zone.BATTLEFIELD, source, game,
                 true, false, false, null
         );
     }

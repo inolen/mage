@@ -57,8 +57,6 @@ public interface Cards extends Set<UUID>, Serializable, Copyable<Cards> {
      */
     Collection<Card> getUniqueCards(Game game);
 
-    Card getRandom(Game game);
-
     /**
      * Warning: this method ignores ObjectSourcePlayer predicates in the filter
      */

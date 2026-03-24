@@ -80,7 +80,7 @@ class ZoologicalStudyEffect extends OneShotEffect {
             case 0:
                 return true;
             case 1:
-                card = cards.getRandom(game);
+                card = game.getCard(cards.iterator().next());
                 break;
             default:
                 TargetCard target = new TargetCard(Zone.ALL, StaticFilters.FILTER_CARD_CREATURE);

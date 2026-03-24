@@ -83,7 +83,7 @@ class WakeToSlaughterEffect extends OneShotEffect {
         if (player != null && !pickedCards.isEmpty()) {
             Card cardToHand;
             if (pickedCards.size() == 1) {
-                cardToHand = pickedCards.getRandom(game);
+                cardToHand = game.getCard(pickedCards.iterator().next());
             } else {
                 Player opponent;
                 Set<UUID> opponents = game.getOpponents(player.getId());

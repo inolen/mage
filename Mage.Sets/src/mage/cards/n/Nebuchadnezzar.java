@@ -80,7 +80,7 @@ class NebuchadnezzarEffect extends OneShotEffect {
         }
         Cards cards = new CardsImpl();
         while (costX > 0) {
-            Card card = opponent.getHand().getRandom(game);
+            Card card = opponent.chooseRandomCard(opponent.getHand(), game);
             if (!cards.contains(card.getId())) {
                 cards.add(card);
                 costX--;

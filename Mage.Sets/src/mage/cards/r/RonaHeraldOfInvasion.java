@@ -136,7 +136,7 @@ class RonaTolarianObliteratorEffect extends OneShotEffect {
         if (controller == null || player == null) {
             return false;
         }
-        Card card = player.getHand().getRandom(game);
+        Card card = player.chooseRandomCard(player.getHand(), game);
         if (card == null) {
             return false;
         }

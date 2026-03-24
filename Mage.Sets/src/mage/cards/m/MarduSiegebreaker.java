@@ -109,7 +109,7 @@ class MarduSiegebreakerEffect extends OneShotEffect {
             case 0:
                 return false;
             case 1:
-                card = cards.getRandom(game);
+                card = game.getCard(cards.iterator().next());
                 break;
             default:
                 card = Optional.ofNullable(game.getPlayer(source.getControllerId())).map(player -> {

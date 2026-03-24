@@ -63,7 +63,7 @@ class ReapThePastEffect extends OneShotEffect {
         int xValue = CardUtil.getSourceCostsTag(game, source, "X", 0);
         Cards cards = new CardsImpl(player.getGraveyard());
         while (cards.size() > xValue) {
-            cards.remove(cards.getRandom(game));
+            cards.remove(player.chooseRandomCard(cards, game));
         }
         player.moveCards(cards, Zone.HAND, source, game);
         return new ExileSpellEffect().apply(game, source);

@@ -106,7 +106,7 @@ class MangarasTomeReplacementEffect extends ReplacementEffectImpl {
     public boolean replaceEvent(GameEvent event, Ability source, Game game) {
         Player controller = game.getPlayer(source.getControllerId());
         if (controller != null) {
-            Card card = game.getExile().getExileZone(CardUtil.getCardExileZoneId(game, source)).getRandom(game);
+            Card card = controller.chooseRandomCard(game.getExile().getExileZone(CardUtil.getCardExileZoneId(game, source)), game);
             if (card != null) {
                 controller.moveCards(card, Zone.HAND, source, game);
             }

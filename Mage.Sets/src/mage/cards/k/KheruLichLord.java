@@ -77,7 +77,7 @@ class KheruLichLordEffect extends OneShotEffect {
         Player controller = game.getPlayer(source.getControllerId());
         if (controller != null) {
             Cards cards = new CardsImpl(controller.getGraveyard().getCards(StaticFilters.FILTER_CARD_CREATURE, source.getControllerId(), source, game));
-            Card card = cards.getRandom(game);
+            Card card = controller.chooseRandomCard(cards, game);
             if (card != null) {
                 controller.moveCards(card, Zone.BATTLEFIELD, source, game);
                 Permanent permanent = CardUtil.getPermanentFromCardPutToBattlefield(card, game);

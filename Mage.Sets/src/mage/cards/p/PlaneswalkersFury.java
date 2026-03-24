@@ -54,7 +54,7 @@ class PlaneswalkersFuryEffect extends OneShotEffect {
         Player opponent = game.getPlayer(getTargetPointer().getFirst(game, source));
         if (opponent != null && !opponent.getHand().isEmpty()) {
             Cards revealed = new CardsImpl();
-            Card card = opponent.getHand().getRandom(game);
+            Card card = opponent.chooseRandomCard(opponent.getHand(), game);
             if (card != null) {
                 revealed.add(card);
                 opponent.revealCards("Planeswalker's Fury", revealed, game);

@@ -849,7 +849,8 @@ public abstract class PlayerImpl implements Player, Serializable {
 
     @Override
     public Card discardOne(boolean random, boolean payForCost, Ability source, Game game) {
-        return discard(1, random, payForCost, source, game).getRandom(game);
+        Cards discarded = discard(1, random, payForCost, source, game);
+        return discarded.isEmpty() ? null : game.getCard(discarded.iterator().next());
     }
 
     @Override
@@ -912,7 +913,7 @@ public abstract class PlayerImpl implements Player, Serializable {
             if (theHand.isEmpty()) {
                 break;
             }
-            Card card = theHand.getRandom(game);
+            Card card = chooseRandomCard(theHand, game, ChooseContext.DISCARD);
             theHand.remove(card);
             toDiscard.add(card);
         }
@@ -1065,7 +1066,7 @@ public abstract class PlayerImpl implements Player, Serializable {
                 }
             } else {
                 // user defined order
-                UUID cardOwner = cards.getRandom(game).getOwnerId();
+                UUID cardOwner = game.getCard(cards.iterator().next()).getOwnerId();
                 TargetCard target = new TargetCard(Zone.ALL,
                         new FilterCard("card ORDER to put on the BOTTOM of " +
                                 (cardOwner.equals(playerId) ? "your" : game.getPlayer(cardOwner).getName() + "'s") +
@@ -1161,7 +1162,7 @@ public abstract class PlayerImpl implements Player, Serializable {
                 }
             } else {
                 // user defined order
-                UUID cardOwner = cards.getRandom(game).getOwnerId();
+                UUID cardOwner = game.getCard(cards.iterator().next()).getOwnerId();
                 TargetCard target = new TargetCard(Zone.ALL,
                         new FilterCard("card ORDER to put on the TOP of " +
                                 (cardOwner.equals(playerId) ? "your" : game.getPlayer(cardOwner).getName() + "'s") +
@@ -5805,9 +5806,23 @@ public abstract class PlayerImpl implements Player, Serializable {
 
     @Override
     public Card chooseRandomCard(Cards cards, Game game) {
-        Card card = cards.getRandom(game);
+        return chooseRandomCard(cards, game, ChooseContext.GENERIC);
+    }
+
+    @Override
+    public Card chooseRandomCard(Cards cards, Game game, ChooseContext context) {
+        if (cards.isEmpty()) {
+            return null;
+        }
+        // necessary if permanent tokens are in the collection
+        Set<MageObject> cardsForRandomPick = cards
+                .stream().map(game::getObject)
+                .filter(Objects::nonNull)
+                .filter(Card.class::isInstance)
+                .collect(Collectors.toSet());
+        Card card = (Card) RandomUtil.randomFromCollection(cardsForRandomPick);
         if (card != null) {
-            DataCollectorServices.getInstance().onChooseRandom(game, this, card);
+            DataCollectorServices.getInstance().onChooseRandom(game, this, card, context);
         }
         return card;
     }

@@ -98,7 +98,7 @@ class NorthamptonFarmEffect extends OneShotEffect {
                 card = null;
                 break;
             case 1:
-                card = creatureCards.getRandom(game);
+                card = game.getCard(creatureCards.iterator().next());
                 break;
             default:
                 TargetCard target = new TargetCardInExile(StaticFilters.FILTER_CARD_CREATURE);

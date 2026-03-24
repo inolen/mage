@@ -72,7 +72,7 @@ class CapriciousHellraiserEffect extends OneShotEffect {
             Cards toExile = new CardsImpl();
             Cards cardsToChooseFrom = new CardsImpl();
             for (int i = 0; i < 3; i++) {
-                Card card = cardsInGraveyard.getRandom(game);
+                Card card = controller.chooseRandomCard(cardsInGraveyard, game);
                 if (card != null) {
                     toExile.add(card);
                     cardsInGraveyard.remove(card);

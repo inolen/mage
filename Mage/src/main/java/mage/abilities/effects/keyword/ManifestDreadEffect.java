@@ -70,7 +70,7 @@ public class ManifestDreadEffect extends OneShotEffect {
             case 0:
                 return null;
             case 1:
-                card = cards.getRandom(game);
+                card = game.getCard(cards.iterator().next());
                 break;
             default:
                 TargetCard target = new TargetCardInLibrary();

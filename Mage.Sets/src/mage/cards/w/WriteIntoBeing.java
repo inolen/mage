@@ -72,7 +72,7 @@ class WriteIntoBeingEffect extends OneShotEffect {
                     cardToManifest = cards.get(target.getFirstTarget(), game);
                 }
             } else {
-                cardToManifest = cards.getRandom(game);
+                cardToManifest = game.getCard(cards.iterator().next());
             }
             if (!controller.getLibrary().getFromTop(game).equals(cardToManifest)) {
                 Card cardToPutBack = controller.getLibrary().removeFromTop(game);

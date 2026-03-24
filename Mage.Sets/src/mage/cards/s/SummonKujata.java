@@ -97,7 +97,7 @@ class SummonKujataEffect extends OneShotEffect {
         if (player == null) {
             return false;
         }
-        Card card = player.discard(1, false, false, source, game).getRandom(game);
+        Card card = player.chooseRandomCard(player.discard(1, false, false, source, game), game);
         player.drawCards(2, source, game);
         if (card != null) {
             game.fireReflexiveTriggeredAbility(new ReflexiveTriggeredAbility(

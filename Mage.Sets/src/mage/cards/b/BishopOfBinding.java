@@ -101,7 +101,7 @@ enum BishopOfBindingValue implements DynamicValue {
     public int calculate(Game game, Ability sourceAbility, Effect effect) {
         ExileZone exileZone = game.getExile().getExileZone(CardUtil.getExileZoneId(game, sourceAbility.getSourceId(), sourceAbility.getStackMomentSourceZCC()));
         if (exileZone != null) {
-            Card exiledCard = exileZone.getRandom(game);
+            Card exiledCard = game.getPlayer(sourceAbility.getControllerId()).chooseRandomCard(exileZone, game);
             if (exiledCard != null) {
                 return exiledCard.getPower().getValue();
             }

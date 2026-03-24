@@ -885,9 +885,10 @@ public class StaxReplayWriter extends EmptyDataCollector {
     }
 
     @Override
-    public void onChooseRandom(Game game, Player player, Card card) {
-        pushAction(StaxEventType.CHOOSE, player.getName(),
-            String.format("\"%s\"", card.getName()));
+    public void onChooseRandom(Game game, Player player, Card card, mage.constants.ChooseContext context) {
+        StaxEventType eventType = context == mage.constants.ChooseContext.DISCARD
+            ? StaxEventType.DISCARD : StaxEventType.CHOOSE;
+        pushAction(eventType, player.getName(), String.format("\"%s\"", card.getName()));
     }
 
     @Override

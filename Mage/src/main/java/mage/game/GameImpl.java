@@ -1383,7 +1383,7 @@ public abstract class GameImpl implements Game {
                     player.chooseTarget(Outcome.Benefit, cardsWithOpeningAction, targetCard, null, this);
                     card = getCard(targetCard.getFirstTarget());
                 } else {
-                    card = cardsWithOpeningAction.getRandom(this);
+                    card = getCard(cardsWithOpeningAction.iterator().next());
                 }
                 if (card != null) {
                     for (Ability ability : card.getAbilities(this)) {

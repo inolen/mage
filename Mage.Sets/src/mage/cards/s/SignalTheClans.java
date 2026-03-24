@@ -71,7 +71,7 @@ class SignalTheClansEffect extends SearchEffect {
                 //If you reveal three cards with different names
                 if (Stream.of(cardsArray).map(MageObject::getName).collect(Collectors.toSet()).size() == 3) {
                     //Choose one of them at random and put that card into your hand
-                    Card randomCard = cards.getRandom(game);
+                    Card randomCard = controller.chooseRandomCard(cards, game);
                     controller.moveCards(randomCard, Zone.HAND, source, game);
                     cards.remove(randomCard);
                 }

@@ -68,7 +68,7 @@ class PlaneswalkersMischiefEffect extends OneShotEffect {
     public boolean apply(Game game, Ability source) {
         Player opponent = game.getPlayer(source.getFirstTarget());
         if (opponent != null && !opponent.getHand().isEmpty()) {
-            Card revealedCard = opponent.getHand().getRandom(game);
+            Card revealedCard = opponent.chooseRandomCard(opponent.getHand(), game);
             if (revealedCard == null) {
                 return false;
             }

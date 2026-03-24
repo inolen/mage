@@ -120,6 +120,6 @@ class WallOfMourningReturnEffect extends OneShotEffect {
         if (exileZone == null || exileZone.isEmpty()) {
             return false;
         }
-        return player.moveCards(exileZone.getRandom(game), Zone.HAND, source, game);
+        return player.moveCards(player.chooseRandomCard(exileZone, game), Zone.HAND, source, game);
     }
 }

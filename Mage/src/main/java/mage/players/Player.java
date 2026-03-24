@@ -684,6 +684,8 @@ public interface Player extends MageItem, Copyable<Player> {
 
     Card chooseRandomCard(Cards cards, Game game);
 
+    Card chooseRandomCard(Cards cards, Game game, mage.constants.ChooseContext context);
+
     boolean chooseMulligan(Game game);
 
     boolean chooseUse(Outcome outcome, String message, Ability source, Game game);

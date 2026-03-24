@@ -98,7 +98,7 @@ class KefkaCourtMageEffect extends OneShotEffect {
                 case 0:
                     continue;
                 case 1:
-                    map.put(playerId, player.getHand().getRandom(game));
+                    map.put(playerId, player.chooseRandomCard(player.getHand(), game));
                     continue;
                 default:
                     TargetDiscard target = new TargetDiscard(playerId);

@@ -84,7 +84,7 @@ class InfernalTutorEffect extends OneShotEffect {
                         cardToReveal = game.getCard(target.getFirstTarget());
                     }
                 } else {
-                    cardToReveal = controller.getHand().getRandom(game);
+                    cardToReveal = controller.chooseRandomCard(controller.getHand(), game);
                 }
                 FilterCard filterCard;
                 if (cardToReveal != null) {

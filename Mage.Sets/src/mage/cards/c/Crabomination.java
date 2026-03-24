@@ -81,11 +81,11 @@ class CrabominationEffect extends OneShotEffect {
         if (fromTop != null) {
             cards.add(fromTop);
         }
-        Card fromGraveyard = opponent.getGraveyard().getRandom(game);
+        Card fromGraveyard = controller.chooseRandomCard(opponent.getGraveyard(), game);
         if (fromGraveyard != null) {
             cards.add(fromGraveyard);
         }
-        Card fromHand = opponent.getHand().getRandom(game);
+        Card fromHand = opponent.chooseRandomCard(opponent.getHand(), game);
         if (fromHand != null) {
             cards.add(fromHand);
         }

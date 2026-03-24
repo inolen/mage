@@ -82,7 +82,7 @@ class MasterOfPredicamentsEffect extends OneShotEffect {
                         cardFromHand = game.getCard(target.getFirstTarget());
                     }
                 } else {
-                    cardFromHand = controller.getHand().getRandom(game);
+                    cardFromHand = controller.chooseRandomCard(controller.getHand(), game);
                 }
                 if (cardFromHand == null) {
                     return false;

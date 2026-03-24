@@ -110,6 +110,6 @@ class FreeForAllReturnFromExileEffect extends OneShotEffect {
             return false;
         }
         Cards exiledCards = new CardsImpl(exZone.getCards(game));
-        return player.moveCards(exiledCards.getRandom(game), Zone.BATTLEFIELD, source, game);
+        return player.moveCards(player.chooseRandomCard(exiledCards, game), Zone.BATTLEFIELD, source, game);
     }
 }

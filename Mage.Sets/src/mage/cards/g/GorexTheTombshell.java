@@ -145,6 +145,6 @@ class GorexTheTombshellReturnEffect extends OneShotEffect {
                 return false;
             }
         }
-        return player.moveCards(exileZone.getRandom(game), Zone.HAND, source, game);
+        return player.moveCards(player.chooseRandomCard(exileZone, game), Zone.HAND, source, game);
     }
 }

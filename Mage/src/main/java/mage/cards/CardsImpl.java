@@ -77,22 +77,6 @@ public class CardsImpl extends LinkedHashSet<UUID> implements Cards, Serializabl
     }
 
     @Override
-    public Card getRandom(Game game) {
-        if (this.isEmpty()) {
-            return null;
-        }
-
-        // necessary if permanent tokens are in the collection
-        Set<MageObject> cardsForRandomPick = this
-                .stream().map(game::getObject)
-                .filter(Objects::nonNull)
-                .filter(Card.class::isInstance)
-                .collect(Collectors.toSet());
-
-        return (Card) RandomUtil.randomFromCollection(cardsForRandomPick);
-    }
-
-    @Override
     public int count(FilterCard filter, Game game) {
         return (int) stream().filter(cardId -> filter.match(game.getCard(cardId), game)).count();
     }

@@ -107,7 +107,7 @@ class KefkaDancingMadEffect extends OneShotEffect {
         for (UUID playerId : game.getOpponents(source.getControllerId())) {
             Player player = game.getPlayer(playerId);
             if (player != null) {
-                cards.add(player.getGraveyard().getRandom(game));
+                cards.add(controller.chooseRandomCard(player.getGraveyard(), game));
             }
         }
         if (cards.isEmpty()) {

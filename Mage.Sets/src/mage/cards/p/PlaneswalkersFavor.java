@@ -68,7 +68,7 @@ class PlaneswalkersFavorEffect extends OneShotEffect {
         Player opponent = game.getPlayer(source.getTargets().get(0).getFirstTarget());
         if (opponent != null && !opponent.getHand().isEmpty()) {
             Cards revealed = new CardsImpl();
-            Card card = opponent.getHand().getRandom(game);
+            Card card = opponent.chooseRandomCard(opponent.getHand(), game);
             if (card != null) {
                 revealed.add(card);
                 int boostValue = card.getManaValue();

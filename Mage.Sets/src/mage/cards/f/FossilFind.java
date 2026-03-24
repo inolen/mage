@@ -56,7 +56,7 @@ class FossilFindEffect extends OneShotEffect {
     public boolean apply(Game game, Ability source) {
         Player controller = game.getPlayer(source.getControllerId());
         if (controller != null && !controller.getGraveyard().isEmpty()) {
-            Card card = controller.getGraveyard().getRandom(game);
+            Card card = controller.chooseRandomCard(controller.getGraveyard(), game);
             if (card != null) {
                 controller.moveCards(card, Zone.HAND, source, game);
                 return true;

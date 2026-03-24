@@ -77,7 +77,7 @@ class OrcishLibrarianEffect extends OneShotEffect {
                 Cards randomExit = new CardsImpl();
                 for (int i = 0; i < 4; i++) {
                     if (!cards.isEmpty()) {
-                        Card card = cards.getRandom(game);
+                        Card card = controller.chooseRandomCard(cards, game);
                         if (card != null) {
                             randomExit.add(card);
                             cards.remove(card);

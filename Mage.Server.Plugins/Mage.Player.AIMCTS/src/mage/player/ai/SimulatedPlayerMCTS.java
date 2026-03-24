@@ -278,7 +278,7 @@ public final class SimulatedPlayerMCTS extends MCTSPlayer {
         if (cards.isEmpty()) {
             return !target.isRequired(source);
         }
-        Card card = cards.getRandom(game);
+        Card card = game.getCard(cards.iterator().next());
         if (card != null) {
             target.addTarget(card.getId(), source, game); // todo: addtryaddtarget or return type (see computerPlayer)
             return true;

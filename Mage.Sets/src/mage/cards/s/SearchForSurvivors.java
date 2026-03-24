@@ -84,7 +84,7 @@ class SearchForSurvivorsEffect extends OneShotEffect {
             // end of randomize
             Cards cards = new CardsImpl(controller.getGraveyard().getCards(game));
             if (!cards.isEmpty()) {
-                Card card = cards.getRandom(game);
+                Card card = controller.chooseRandomCard(cards, game);
                 cards.clear();
                 cards.add(card);
                 controller.revealCards(source, cards, game); // reveal the card randomly chosen.

@@ -155,7 +155,7 @@ class ForebodingSteamboatInvestigateEffect extends OneShotEffect {
             case 0:
                 return false;
             case 1:
-                card = exileZone.getRandom(game);
+                card = game.getCard(exileZone.iterator().next());
                 break;
             default:
                 TargetCard target = new TargetCardInExile(StaticFilters.FILTER_CARD, exileZone.getId());

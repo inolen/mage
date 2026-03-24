@@ -79,7 +79,7 @@ class TarielReckonerOfSoulsEffect extends OneShotEffect {
                 creatureCards.add(card);
             }
             if (!creatureCards.isEmpty()) {
-                Card card = creatureCards.getRandom(game);
+                Card card = game.getCard(creatureCards.iterator().next());
                 controller.moveCards(card, Zone.BATTLEFIELD, source, game);
             }
             return true;

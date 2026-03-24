@@ -69,7 +69,7 @@ class MurmursFromBeyondEffect extends OneShotEffect {
                 controller.revealCards(staticText, cards, game);
                 Card cardToGraveyard;
                 if (cards.size() == 1) {
-                    cardToGraveyard = cards.getRandom(game);
+                    cardToGraveyard = game.getCard(cards.iterator().next());
                 } else {
                     Player opponent;
                     Set<UUID> opponents = game.getOpponents(controller.getId());

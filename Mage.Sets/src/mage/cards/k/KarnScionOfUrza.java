@@ -88,7 +88,7 @@ class KarnPlus1Effect extends OneShotEffect {
             case 0:
                 return false;
             case 1:
-                cardToHand = cards.getRandom(game);
+                cardToHand = game.getCard(cards.iterator().next());
                 break;
             default:
                 Player opponent;
@@ -154,7 +154,7 @@ class KarnMinus1Effect extends OneShotEffect {
             case 0:
                 return false;
             case 1:
-                card = cards.getRandom(game);
+                card = game.getCard(cards.iterator().next());
                 break;
             default:
                 TargetCard target = new TargetCardInExile(filter);

@@ -70,7 +70,7 @@ class GoblinSecretAgentEffect extends OneShotEffect {
         if (controller != null && sourceObject != null) {
             if (!controller.getHand().isEmpty()) {
                 CardsImpl randomCard = new CardsImpl();
-                Card card = controller.getHand().getRandom(game);
+                Card card = controller.chooseRandomCard(controller.getHand(), game);
                 randomCard.add(card);
                 controller.revealCards(sourceObject.getIdName(), randomCard, game);
             }

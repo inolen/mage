@@ -83,7 +83,7 @@ class FeldonRonomExcavatorEffect extends OneShotEffect {
             case 0:
                 return false;
             case 1:
-                card = cards.getRandom(game);
+                card = game.getCard(cards.iterator().next());
                 break;
             default:
                 TargetCard target = new TargetCardInExile(StaticFilters.FILTER_CARD);

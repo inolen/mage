@@ -80,7 +80,7 @@ class RiverwheelSweepEffect extends OneShotEffect {
             case 0:
                 return false;
             case 1:
-                card = cards.getRandom(game);
+                card = player.chooseRandomCard(cards, game);
                 break;
             default:
                 TargetCard target = new TargetCardInExile(StaticFilters.FILTER_CARD);

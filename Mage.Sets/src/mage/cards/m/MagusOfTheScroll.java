@@ -70,7 +70,7 @@ class MagusOfTheScrollEffect extends OneShotEffect {
         if (sourceObject != null && you != null && cardName != null && !cardName.isEmpty()) {
             if (!you.getHand().isEmpty()) {
                 Cards revealed = new CardsImpl();
-                Card card = you.getHand().getRandom(game);
+                Card card = you.chooseRandomCard(you.getHand(), game);
                 if (card == null) {
                     return false;
                 }

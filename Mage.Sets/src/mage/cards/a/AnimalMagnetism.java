@@ -64,7 +64,7 @@ class AnimalMagnetismEffect extends OneShotEffect {
                 controller.revealCards(staticText, cards, game);
                 Card cardToBattlefield;
                 if (cards.size() == 1) {
-                    cardToBattlefield = cards.getRandom(game);
+                    cardToBattlefield = game.getCard(cards.iterator().next());
                 } else {
                     Player opponent;
                     Set<UUID> opponents = game.getOpponents(controller.getId());

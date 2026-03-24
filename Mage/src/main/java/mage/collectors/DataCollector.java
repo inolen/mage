@@ -101,7 +101,7 @@ public interface DataCollector {
 
     void onChooseUse(Game game, Player player, boolean choice);
 
-    void onChooseRandom(Game game, Player player, Card card);
+    void onChooseRandom(Game game, Player player, Card card, mage.constants.ChooseContext context);
 
     /**
      * On a player revealing cards (e.g. Polymorph library iteration)

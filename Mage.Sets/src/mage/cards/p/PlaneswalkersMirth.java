@@ -60,7 +60,7 @@ class PlaneswalkersMirthEffect extends OneShotEffect {
         Player player = game.getPlayer(source.getControllerId());
         if (opponent != null && player!= null && !opponent.getHand().isEmpty()) {
             Cards revealed = new CardsImpl();
-            Card card = opponent.getHand().getRandom(game);
+            Card card = opponent.chooseRandomCard(opponent.getHand(), game);
             if (card != null) {
                 revealed.add(card);
                 opponent.revealCards("Planeswalker's Mirth", revealed, game);

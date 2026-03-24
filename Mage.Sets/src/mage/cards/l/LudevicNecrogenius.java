@@ -119,11 +119,11 @@ class OlagLudevicsHubrisEffect extends ReplacementEffectImpl {
 
     private Card getCard(Cards cards, Ability source, Game game) {
         if (cards.size() == 1) {
-            return cards.getRandom(game);
+            return game.getCard(cards.iterator().next());
         }
         Player player = game.getPlayer(source.getControllerId());
         if (player == null) {
-            return cards.getRandom(game);
+            return game.getCard(cards.iterator().next());
         }
         TargetCard target = new TargetCardInExile(StaticFilters.FILTER_CARD);
         player.choose(outcome, target, source, game);

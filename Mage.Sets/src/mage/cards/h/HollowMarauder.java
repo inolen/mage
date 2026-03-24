@@ -90,7 +90,7 @@ class HollowMarauderEffect extends OneShotEffect {
             if (opponent == null) {
                 continue;
             }
-            Card card = opponent.discard(1, false, false, source, game).getRandom(game);
+            Card card = opponent.chooseRandomCard(opponent.discard(1, false, false, source, game), game);
             if (card == null || card.getManaValue() < 4) {
                 count++;
             }

@@ -152,7 +152,7 @@ class LukkaWaywardBonderDiscardEffect extends OneShotEffect {
         if (player == null) {
             return false;
         }
-        Card card = player.discard(0, 1, false, source, game).getRandom(game);
+        Card card = player.chooseRandomCard(player.discard(0, 1, false, source, game), game);
         if (card == null) {
             return false;
         }

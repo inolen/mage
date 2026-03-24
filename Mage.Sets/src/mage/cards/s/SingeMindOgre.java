@@ -70,7 +70,7 @@ class SingeMindOgreEffect extends OneShotEffect {
         Player targetPlayer = game.getPlayer(source.getFirstTarget());
         if (targetPlayer != null && !targetPlayer.getHand().isEmpty()) {
             Cards revealed = new CardsImpl();
-            Card card = targetPlayer.getHand().getRandom(game);
+            Card card = targetPlayer.chooseRandomCard(targetPlayer.getHand(), game);
             if (card != null) {
                 revealed.add(card);
                 targetPlayer.revealCards("Singe-Mind Ogre", revealed, game);

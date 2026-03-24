@@ -56,7 +56,7 @@ class IgniteMemoriesEffect extends OneShotEffect {
         if (controller != null && sourceObject != null) {
             if (!controller.getHand().isEmpty()) {
                 Cards revealed = new CardsImpl();
-                Card card = controller.getHand().getRandom(game);
+                Card card = controller.chooseRandomCard(controller.getHand(), game);
                 if (card != null) {
                     revealed.add(card);
                     controller.revealCards(sourceObject.getIdName(), revealed, game);

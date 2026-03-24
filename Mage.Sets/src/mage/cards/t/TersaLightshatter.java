@@ -74,7 +74,7 @@ class TersaLightshatterEffect extends OneShotEffect {
         if (player == null) {
             return false;
         }
-        Card card = player.getGraveyard().getRandom(game);
+        Card card = player.chooseRandomCard(player.getGraveyard(), game);
         if (card == null) {
             return false;
         }

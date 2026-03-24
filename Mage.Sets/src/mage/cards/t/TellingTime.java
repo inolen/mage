@@ -96,7 +96,7 @@ class TellingTimeEffect extends OneShotEffect {
             return null;
         }
         if (cards.size() == 1) {
-            Card card = cards.getRandom(game);
+            Card card = game.getCard(cards.iterator().next());
             cards.remove(card);
             return card;
         }

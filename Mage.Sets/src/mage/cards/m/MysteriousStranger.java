@@ -106,7 +106,7 @@ class MysteriousStrangerEffect extends OneShotEffect {
         if (cards.size() < 2) {
             return true;
         }
-        Card card = cards.getRandom(game);
+        Card card = player.chooseRandomCard(cards, game);
         if (card == null) {
             return true;
         }
