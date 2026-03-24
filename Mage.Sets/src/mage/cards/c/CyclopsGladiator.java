@@ -10,6 +10,7 @@ import mage.cards.CardImpl;
 import mage.cards.CardSetInfo;
 import mage.constants.CardType;
 import mage.constants.Outcome;
+import mage.constants.SetTargetPointer;
 import mage.constants.SubType;
 import mage.filter.StaticFilters;
 import mage.game.Game;
@@ -35,7 +36,7 @@ public final class CyclopsGladiator extends CardImpl {
 
         // Whenever Cyclops Gladiator attacks, you may have it deal damage equal to its power to target creature defending player controls. 
         // If you do, that creature deals damage equal to its power to Cyclops Gladiator.
-        Ability ability = new AttacksTriggeredAbility(new CyclopsGladiatorEffect(), true);
+        Ability ability = new AttacksTriggeredAbility(new CyclopsGladiatorEffect(), true, null, SetTargetPointer.PLAYER);
         ability.addTarget(new TargetPermanent(StaticFilters.FILTER_PERMANENT_CREATURE));
         ability.setTargetAdjuster(new ThatPlayerControlsTargetAdjuster());
         this.addAbility(ability);
