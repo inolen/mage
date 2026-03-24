@@ -2158,7 +2158,7 @@ public class HumanPlayer extends PlayerImpl {
     }
 
     @Override
-    public List<Integer> getMultiAmountWithIndividualConstraints(
+    public List<Integer> doGetMultiAmountWithIndividualConstraints(
             Outcome outcome,
             List<MultiAmountMessage> messages,
             int totalMin,

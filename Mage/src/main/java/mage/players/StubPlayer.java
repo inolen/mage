@@ -191,7 +191,7 @@ public class StubPlayer extends PlayerImpl {
     }
 
     @Override
-    public List<Integer> getMultiAmountWithIndividualConstraints(Outcome outcome, List<MultiAmountMessage> messages,
+    public List<Integer> doGetMultiAmountWithIndividualConstraints(Outcome outcome, List<MultiAmountMessage> messages,
                                                                  int totalMin, int totalMax, MultiAmountType type, Game game) {
         return null;
     }

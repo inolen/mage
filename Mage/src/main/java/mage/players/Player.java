@@ -797,17 +797,31 @@ public interface Player extends MageItem, Copyable<Player> {
     }
 
     /**
-     * Player distributes amount among multiple options
-     *
-     * @param outcome  AI hint
-     * @param messages List of options to distribute amount among. Each option has a constraint on the min, max chosen for it
-     * @param totalMin Total minimum amount to be distributed
-     * @param totalMax Total amount to be distributed
-     * @param type     MultiAmountType enum to set dialog options such as title and header
-     * @param game     Game
-     * @return List of integers with size equal to messages.size().  The sum of the integers is equal to max.
+     * Player distributes amount among multiple options.
+     * Wrapper that calls doGetMultiAmountWithIndividualConstraints then emits
+     * data-collector events.  Do not override -- override doGetMultiAmountWithIndividualConstraints instead.
      */
-    List<Integer> getMultiAmountWithIndividualConstraints(Outcome outcome, List<MultiAmountMessage> messages, int totalMin, int totalMax, MultiAmountType type, Game game);
+    default List<Integer> getMultiAmountWithIndividualConstraints(Outcome outcome, List<MultiAmountMessage> messages, int totalMin, int totalMax, MultiAmountType type, Game game) {
+        List<Integer> result = doGetMultiAmountWithIndividualConstraints(outcome, messages, totalMin, totalMax, type, game);
+        if (result != null && !game.isSimulation()) {
+            java.util.List<mage.choices.Choice> choices = new java.util.ArrayList<>();
+            for (Integer val : result) {
+                String s = String.valueOf(val);
+                mage.choices.ChoiceImpl c = new mage.choices.ChoiceImpl(false);
+                c.getChoices().add(s);
+                c.setChoice(s);
+                choices.add(c);
+            }
+            mage.collectors.DataCollectorServices.getInstance().onMultiChoose(game, this, choices, ChooseKind.DIVIDE);
+        }
+        return result;
+    }
+
+    /**
+     * Implementation of getMultiAmountWithIndividualConstraints.
+     * Override this in subclasses.
+     */
+    List<Integer> doGetMultiAmountWithIndividualConstraints(Outcome outcome, List<MultiAmountMessage> messages, int totalMin, int totalMax, MultiAmountType type, Game game);
 
     void sideboard(Match match, Deck deck);
 

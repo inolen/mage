@@ -153,6 +153,11 @@ public abstract class EmptyDataCollector implements DataCollector {
         // nothing
     }
 
+    @Override
+    public void onMultiChoose(Game game, Player player, java.util.List<mage.choices.Choice> choices, mage.constants.ChooseKind kind) {
+        // nothing
+    }
+
     /* ------------------------------------------------------------------
      * Chat
      * ------------------------------------------------------------------ */

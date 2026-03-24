@@ -2801,7 +2801,7 @@ public class TestPlayer implements Player {
     }
 
     @Override
-    public List<Integer> getMultiAmountWithIndividualConstraints(Outcome outcome, List<MultiAmountMessage> messages,
+    public List<Integer> doGetMultiAmountWithIndividualConstraints(Outcome outcome, List<MultiAmountMessage> messages,
                                                                  int totalMin, int totalMax, MultiAmountType type, Game game) {
         assertAliasSupportInChoices(false);
 
@@ -2844,7 +2844,7 @@ public class TestPlayer implements Player {
         }
 
         this.chooseStrictModeFailed("choice", game, "Multi amount: " + type.getHeader());
-        return computerPlayer.getMultiAmountWithIndividualConstraints(outcome, messages, totalMin, totalMax, type, game);
+        return computerPlayer.doGetMultiAmountWithIndividualConstraints(outcome, messages, totalMin, totalMax, type, game);
     }
 
     @Override

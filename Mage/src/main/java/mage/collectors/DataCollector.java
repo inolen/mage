@@ -116,6 +116,8 @@ public interface DataCollector {
 
     void onChoose(Game game, Player player, mage.choices.Choice choice, mage.constants.ChooseKind kind);
 
+    void onMultiChoose(Game game, Player player, java.util.List<mage.choices.Choice> choices, mage.constants.ChooseKind kind);
+
     /* ------------------------------------------------------------------
      * Chat
      * ------------------------------------------------------------------ */

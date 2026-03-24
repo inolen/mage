@@ -71,7 +71,8 @@ public class StaxReplayWriter extends EmptyDataCollector {
         TOP,
         DISCARD,
         KEEP,
-        MULLIGAN
+        MULLIGAN,
+        DIVIDE
     }
 
     private static class StaxEvent {
@@ -194,6 +195,7 @@ public class StaxReplayWriter extends EmptyDataCollector {
         if (type == StaxEventType.DISCARD) return "discard";
         if (type == StaxEventType.KEEP) return "keep";
         if (type == StaxEventType.MULLIGAN) return "mulligan";
+        if (type == StaxEventType.DIVIDE) return "divide";
         return "unknown";
     }
 
@@ -926,6 +928,18 @@ public class StaxReplayWriter extends EmptyDataCollector {
             return;
         }
         pushChoose(player.getName(), String.format("\"%s\"", choice.getChoice()), kind);
+    }
+
+    @Override
+    public void onMultiChoose(Game game, Player player, java.util.List<mage.choices.Choice> choices, mage.constants.ChooseKind kind) {
+        if (kind == mage.constants.ChooseKind.DIVIDE) {
+            StringBuilder sb = new StringBuilder();
+            for (int i = 0; i < choices.size(); i++) {
+                if (i > 0) sb.append(' ');
+                sb.append(choices.get(i).getChoice());
+            }
+            pushAction(StaxEventType.DIVIDE, player.getName(), sb.toString());
+        }
     }
 
     @Override

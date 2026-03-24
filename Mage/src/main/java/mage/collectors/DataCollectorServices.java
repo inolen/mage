@@ -246,6 +246,12 @@ final public class DataCollectorServices implements DataCollector {
         activeServices.forEach(c -> c.onChoose(game, player, choice, kind));
     }
 
+    @Override
+    public void onMultiChoose(Game game, Player player, java.util.List<mage.choices.Choice> choices, mage.constants.ChooseKind kind) {
+        if (game.isSimulation()) return;
+        activeServices.forEach(c -> c.onMultiChoose(game, player, choices, kind));
+    }
+
     /* ------------------------------------------------------------------
      * Chat
      * ------------------------------------------------------------------ */

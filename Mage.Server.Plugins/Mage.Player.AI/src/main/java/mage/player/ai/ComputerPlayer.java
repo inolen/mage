@@ -943,7 +943,7 @@ public class ComputerPlayer extends PlayerImpl {
     }
 
     @Override
-    public List<Integer> getMultiAmountWithIndividualConstraints(Outcome outcome, List<MultiAmountMessage> messages,
+    public List<Integer> doGetMultiAmountWithIndividualConstraints(Outcome outcome, List<MultiAmountMessage> messages,
                                                                  int totalMin, int totalMax, MultiAmountType type, Game game) {
         int needCount = messages.size();
         List<Integer> defaultList = MultiAmountType.prepareDefaultValues(messages, totalMin, totalMax);

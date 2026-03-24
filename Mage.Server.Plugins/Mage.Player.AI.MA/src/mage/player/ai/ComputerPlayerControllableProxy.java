@@ -285,7 +285,7 @@ public class ComputerPlayerControllableProxy extends ComputerPlayer7 {
     }
 
     @Override
-    public List<Integer> getMultiAmountWithIndividualConstraints(
+    public List<Integer> doGetMultiAmountWithIndividualConstraints(
             Outcome outcome,
             List<MultiAmountMessage> messages,
             int totalMin,
@@ -294,7 +294,7 @@ public class ComputerPlayerControllableProxy extends ComputerPlayer7 {
             Game game
     ) {
         if (isUnderMe(game)) {
-            return super.getMultiAmountWithIndividualConstraints(outcome, messages, totalMin, totalMax, type, game);
+            return super.doGetMultiAmountWithIndividualConstraints(outcome, messages, totalMin, totalMax, type, game);
         } else {
             return getControllingPlayer(game).getMultiAmountWithIndividualConstraints(outcome, messages, totalMin, totalMax, type, game);
         }
