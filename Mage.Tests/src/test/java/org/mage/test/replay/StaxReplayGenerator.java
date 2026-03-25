@@ -105,9 +105,9 @@ public class StaxReplayGenerator extends CardTestPlayerBaseAI {
             pairIdx2 = deckRng.nextInt(colorPairs.length);
         } while (pairIdx2 == pairIdx1);
 
-        List<String> deckA = buildDeck(creatures, nonCreatureSpells, basicLands, nonbasicLands,
+        List<String> deckA = buildDeck(setCode, creatures, nonCreatureSpells, basicLands, nonbasicLands,
                 colorPairs[pairIdx1][0], colorPairs[pairIdx1][1], deckRng);
-        List<String> deckB = buildDeck(creatures, nonCreatureSpells, basicLands, nonbasicLands,
+        List<String> deckB = buildDeck(setCode, creatures, nonCreatureSpells, basicLands, nonbasicLands,
                 colorPairs[pairIdx2][0], colorPairs[pairIdx2][1], deckRng);
 
         // Set up the game
@@ -137,7 +137,7 @@ public class StaxReplayGenerator extends CardTestPlayerBaseAI {
      * ~24 lands, ~22-24 creatures, ~12-14 spells.
      * Follows a basic mana curve: prefer low-cost creatures, some mid-range, a few bombs.
      */
-    private List<String> buildDeck(List<CardInfo> creatures, List<CardInfo> spells,
+    private List<String> buildDeck(String setCode, List<CardInfo> creatures, List<CardInfo> spells,
                                     List<CardInfo> basicLands, List<CardInfo> nonbasicLands,
                                     String color1, String color2, Random rng) {
         List<String> deck = new ArrayList<>();
@@ -167,10 +167,10 @@ public class StaxReplayGenerator extends CardTestPlayerBaseAI {
         List<CardInfo> pickedSpells = pickWithCurve(colorSpells, targetSpells, rng);
 
         for (CardInfo c : pickedCreatures) {
-            deck.add(c.getName());
+            deck.add(c.getSetCode() + "-" + c.getName());
         }
         for (CardInfo c : pickedSpells) {
-            deck.add(c.getName());
+            deck.add(c.getSetCode() + "-" + c.getName());
         }
 
         // Pad with colorless creatures/spells if we're short
@@ -181,13 +181,13 @@ public class StaxReplayGenerator extends CardTestPlayerBaseAI {
             Collections.shuffle(colorless, rng);
             for (CardInfo c : colorless) {
                 if (deck.size() >= NONLAND_COUNT) break;
-                deck.add(c.getName());
+                deck.add(c.getSetCode() + "-" + c.getName());
             }
         }
 
         // Add lands — split roughly evenly between the two colors
-        String land1 = basicLandForColor(color1);
-        String land2 = basicLandForColor(color2);
+        String land1 = setCode + "-" + basicLandForColor(color1);
+        String land2 = setCode + "-" + basicLandForColor(color2);
         int lands1 = LAND_COUNT / 2;
         int lands2 = LAND_COUNT - lands1;
         for (int i = 0; i < lands1; i++) {
