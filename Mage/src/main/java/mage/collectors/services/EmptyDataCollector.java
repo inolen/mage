@@ -164,6 +164,21 @@ public abstract class EmptyDataCollector implements DataCollector {
     }
 
     @Override
+    public void onScry(Game game, Player player, java.util.List<String> cardNames) {
+        // nothing
+    }
+
+    @Override
+    public void onScryPutBottom(Game game, Player player, java.util.List<String> cardNames) {
+        // nothing
+    }
+
+    @Override
+    public void onScryPutTop(Game game, Player player, java.util.List<String> cardNames) {
+        // nothing
+    }
+
+    @Override
     public void onChoose(Game game, Player player, Target target, mage.constants.ChooseKind kind) {
         // nothing
     }

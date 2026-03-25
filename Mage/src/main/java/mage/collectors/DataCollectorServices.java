@@ -259,6 +259,30 @@ final public class DataCollectorServices implements DataCollector {
     }
 
     @Override
+    public void onScry(Game game, Player player, java.util.List<String> cardNames) {
+        if (game.isSimulation()) {
+            return;
+        }
+        activeServices.forEach(c -> c.onScry(game, player, cardNames));
+    }
+
+    @Override
+    public void onScryPutBottom(Game game, Player player, java.util.List<String> cardNames) {
+        if (game.isSimulation()) {
+            return;
+        }
+        activeServices.forEach(c -> c.onScryPutBottom(game, player, cardNames));
+    }
+
+    @Override
+    public void onScryPutTop(Game game, Player player, java.util.List<String> cardNames) {
+        if (game.isSimulation()) {
+            return;
+        }
+        activeServices.forEach(c -> c.onScryPutTop(game, player, cardNames));
+    }
+
+    @Override
     public void onChoose(Game game, Player player, Target target, mage.constants.ChooseKind kind) {
         if (game.isSimulation()) return;
         activeServices.forEach(c -> c.onChoose(game, player, target, kind));

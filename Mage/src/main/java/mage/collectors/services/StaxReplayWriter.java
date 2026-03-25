@@ -64,10 +64,12 @@ public class StaxReplayWriter extends EmptyDataCollector {
         LEYLINE,
         DRAW,
         DRAW_BOTTOM,
-        PUT_BOTTOM,
+        BOTTOM,
         MILL,
         REVEAL,
         LOOK,
+        SCRY,
+        PEEK,
         TOP,
         DISCARD,
         KEEP,
@@ -129,6 +131,9 @@ public class StaxReplayWriter extends EmptyDataCollector {
     private String currentPlayerName = null;
     private mage.ApprovingObject currentApprovingObject = null;
     private final List<StaxEvent> abilityChoices = new ArrayList<>();
+    private String scryPlayer = null;
+    private java.util.List<String> scryTopCards = null;
+    private java.util.List<String> scryBottomCards = null;
     private GameSnapshot lastSnapshot;
 
     public StaxReplayWriter() {
@@ -190,10 +195,12 @@ public class StaxReplayWriter extends EmptyDataCollector {
         if (type == StaxEventType.LEYLINE) return "leyline";
         if (type == StaxEventType.DRAW) return "draw";
         if (type == StaxEventType.DRAW_BOTTOM) return "draw_bottom";
-        if (type == StaxEventType.PUT_BOTTOM) return "put_bottom";
+        if (type == StaxEventType.BOTTOM) return "bottom";
         if (type == StaxEventType.MILL) return "mill";
         if (type == StaxEventType.REVEAL) return "reveal";
         if (type == StaxEventType.LOOK) return "look";
+        if (type == StaxEventType.SCRY) return "scry";
+        if (type == StaxEventType.PEEK) return "peek";
         if (type == StaxEventType.TOP) return "top";
         if (type == StaxEventType.DISCARD) return "discard";
         if (type == StaxEventType.KEEP) return "keep";
@@ -212,7 +219,9 @@ public class StaxReplayWriter extends EmptyDataCollector {
             UUID pid = entry.getKey();
             PlayerSnapshot cp = entry.getValue();
             PlayerSnapshot pp = prev.players.get(pid);
-            if (pp == null) continue;
+            if (pp == null) {
+                continue;
+            }
 
             if (cp.life != pp.life) delta.add(new String[]{String.format("%s.life", cp.name), String.valueOf(cp.life)});
             if (cp.landsPlayed != pp.landsPlayed) delta.add(new String[]{String.format("%s.lands_played", cp.name), String.valueOf(cp.landsPlayed)});
@@ -232,7 +241,9 @@ public class StaxReplayWriter extends EmptyDataCollector {
             UUID permId = entry.getKey();
             PermanentSnapshot cp = entry.getValue();
             PermanentSnapshot pp = prev.permanents.get(permId);
-            if (pp == null) continue;
+            if (pp == null) {
+                continue;
+            }
 
             if (cp.tapped != pp.tapped) delta.add(new String[]{String.format("%s.tapped", cp.path), String.valueOf(cp.tapped)});
             if (cp.power != pp.power) delta.add(new String[]{String.format("%s.power", cp.path), String.valueOf(cp.power)});
@@ -258,15 +269,25 @@ public class StaxReplayWriter extends EmptyDataCollector {
     }
 
     private static String resolveCardName(Game game, UUID objectId) {
-        if (objectId == null) return "Unknown";
+        if (objectId == null) {
+            return "Unknown";
+        }
         Permanent perm = game.getPermanent(objectId);
-        if (perm != null) return perm.getName();
+        if (perm != null) {
+            return perm.getName();
+        }
         Card card = game.getCard(objectId);
-        if (card != null) return card.getName();
+        if (card != null) {
+            return card.getName();
+        }
         StackObject stackObj = game.getStack().getStackObject(objectId);
-        if (stackObj != null) return stackObj.getName();
+        if (stackObj != null) {
+            return stackObj.getName();
+        }
         Player player = game.getPlayer(objectId);
-        if (player != null) return player.getName();
+        if (player != null) {
+            return player.getName();
+        }
         return "unknown";
     }
 
@@ -417,7 +438,9 @@ public class StaxReplayWriter extends EmptyDataCollector {
 
         for (UUID playerId : game.getPlayerList()) {
             Player player = game.getPlayer(playerId);
-            if (player == null) continue;
+            if (player == null) {
+                continue;
+            }
 
             PlayerSnapshot ps = new PlayerSnapshot();
             ps.name = player.getName();
@@ -607,7 +630,7 @@ public class StaxReplayWriter extends EmptyDataCollector {
         Player p = requirePlayer(game, playerId);
         String name = resolveCardName(game, cardId);
         String arg = formatCardInstance(name, 0);
-        write(String.format("%s put_bottom %s", p.getName(), arg));
+        write(String.format("%s bottom %s", p.getName(), arg));
     }
 
     @Override
@@ -803,6 +826,9 @@ public class StaxReplayWriter extends EmptyDataCollector {
     // cost payment BEFORE the ACTIVATED_ABILITY event fires.  Buffer them so
     // they appear after the activate line in the replay file.
     private void pushChoose(String player, String ref, mage.constants.ChooseKind kind) {
+        if (scryPlayer != null) {
+            return;
+        }
         if (currentAbility != null) {
             StaxEvent se = new StaxEvent();
             se.type = StaxEventType.CHOOSE;
@@ -906,6 +932,9 @@ public class StaxReplayWriter extends EmptyDataCollector {
 
     @Override
     public void onChooseUse(Game game, Player player, boolean choice) {
+        if (scryPlayer != null) {
+            return;
+        }
         pushAction(StaxEventType.CHOOSE, player.getName(),
             String.format("\"%s\"", choice ? "Yes" : "No"));
     }
@@ -993,23 +1022,66 @@ public class StaxReplayWriter extends EmptyDataCollector {
         Card topCard = player.getLibrary().getFromTop(game);
         if (topCard != null) {
             String arg = formatCardInstance(topCard.getName(), 0);
-            pushAction(StaxEventType.TOP, player.getName(), "library." + arg);
+            pushAction(StaxEventType.PEEK, player.getName(), "library." + arg);
         }
     }
 
     @Override
     public void onCardsLookedAt(Game game, Player player, mage.cards.Cards cards) {
+        StringJoiner sj = new StringJoiner(" ");
+        String zoneName = null;
         for (Card card : cards.getCards(game)) {
             Zone zone = game.getState().getZone(card.getId());
-            String zoneName;
             if (zone == Zone.LIBRARY) {
-                zoneName = "library";
+                if (zoneName == null) {
+                    zoneName = "library";
+                }
             } else {
                 continue;
             }
-            String arg = formatCardInstance(card.getName(), 0);
-            pushAction(StaxEventType.LOOK, player.getName(), zoneName + "." + arg);
+            sj.add(formatCardInstance(card.getName(), 0));
         }
+        if (zoneName != null && sj.toString().length() > 0) {
+            pushAction(StaxEventType.LOOK, player.getName(), zoneName + "." + sj.toString());
+        }
+    }
+
+    @Override
+    public void onScry(Game game, Player player, java.util.List<String> cardNames) {
+        scryPlayer = player.getName();
+        scryTopCards = null;
+        scryBottomCards = null;
+    }
+
+    @Override
+    public void onScryPutBottom(Game game, Player player, java.util.List<String> cardNames) {
+        scryBottomCards = cardNames;
+    }
+
+    @Override
+    public void onScryPutTop(Game game, Player player, java.util.List<String> cardNames) {
+        scryTopCards = cardNames;
+        // Emit single scry line: scry top "a" "b" bottom "c" "d"
+        StringBuilder sb = new StringBuilder();
+        if (scryTopCards != null && !scryTopCards.isEmpty()) {
+            sb.append("top");
+            for (String name : scryTopCards) {
+                sb.append(" ").append(formatCardInstance(name, 0));
+            }
+        }
+        if (scryBottomCards != null && !scryBottomCards.isEmpty()) {
+            if (sb.length() > 0) {
+                sb.append(" ");
+            }
+            sb.append("bottom");
+            for (String name : scryBottomCards) {
+                sb.append(" ").append(formatCardInstance(name, 0));
+            }
+        }
+        pushAction(StaxEventType.SCRY, scryPlayer, sb.toString());
+        scryPlayer = null;
+        scryTopCards = null;
+        scryBottomCards = null;
     }
 
     @Override

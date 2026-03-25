@@ -122,6 +122,10 @@ public interface DataCollector {
 
     void onTopCardMayHaveChanged(Game game, Player player);
 
+    void onScry(Game game, Player player, java.util.List<String> cardNames);
+    void onScryPutBottom(Game game, Player player, java.util.List<String> cardNames);
+    void onScryPutTop(Game game, Player player, java.util.List<String> cardNames);
+
     void onChoose(Game game, Player player, Target target, mage.constants.ChooseKind kind);
 
     void onChoose(Game game, Player player, mage.choices.Choice choice, mage.constants.ChooseKind kind);

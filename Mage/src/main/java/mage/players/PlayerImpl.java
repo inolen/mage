@@ -5496,10 +5496,28 @@ public abstract class PlayerImpl implements Player, Serializable {
         Cards cards = new CardsImpl();
         cards.addAllCards(getLibrary().getTopCards(game, event.getAmount()));
         if (!cards.isEmpty()) {
+            // Emit scry card names before any moves
+            List<String> scryNames = new ArrayList<>();
+            for (Card c : cards.getCards(game)) {
+                scryNames.add(c.getName());
+            }
+            DataCollectorServices.getInstance().onScry(game, this, scryNames);
+
             TargetCard target = new TargetCard(0, cards.size(), Zone.LIBRARY,
                     new FilterCard("card" + (cards.size() == 1 ? "" : "s")
                             + " to PUT on the BOTTOM of your library (Scry)"));
             chooseTarget(Outcome.Benefit, cards, target, source, game);
+
+            // Emit bottom card names before move
+            List<String> bottomNames = new ArrayList<>();
+            for (UUID id : target.getTargets()) {
+                Card c = game.getCard(id);
+                if (c != null) {
+                    bottomNames.add(c.getName());
+                }
+            }
+            DataCollectorServices.getInstance().onScryPutBottom(game, this, bottomNames);
+
             putCardsOnBottomOfLibrary(new CardsImpl(target.getTargets()), game, source, true);
             if (!target.getTargets().isEmpty()) {
                 game.fireEvent(GameEvent.getEvent(
@@ -5508,6 +5526,14 @@ public abstract class PlayerImpl implements Player, Serializable {
                 ));
             }
             cards.removeIf(target.getTargets()::contains);
+
+            // Emit top card names before move
+            List<String> topNames = new ArrayList<>();
+            for (Card c : cards.getCards(game)) {
+                topNames.add(c.getName());
+            }
+            DataCollectorServices.getInstance().onScryPutTop(game, this, topNames);
+
             putCardsOnTopOfLibrary(cards, game, source, true);
         }
         game.fireEvent(new GameEvent(GameEvent.EventType.SCRIED, getId(), source, getId(), event.getAmount(), true));
