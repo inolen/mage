@@ -108,7 +108,7 @@ public class Targets extends ArrayList<Target> implements Copyable<Targets> {
                 // from AI simulation).  Skip spell/ability targets (isTargetChoice) since those
                 // are already captured in the cast/activate line's target syntax.
                 if (!isTargetChoice && target.isChoiceSelected() && !game.isSimulation()) {
-                    DataCollectorServices.getInstance().onChoose(game, player, target, mage.constants.ChooseKind.PAYMENT);
+                    DataCollectorServices.getInstance().onChoose(game, player, target, mage.constants.ChooseKind.COST_PAYMENT);
                 }
                 continue;
             }

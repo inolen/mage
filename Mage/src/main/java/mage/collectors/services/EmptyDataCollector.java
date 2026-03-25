@@ -139,6 +139,16 @@ public abstract class EmptyDataCollector implements DataCollector {
     }
 
     @Override
+    public void onBeginManaAbility(Game game, Player player, mage.abilities.mana.ActivatedManaAbilityImpl ability) {
+        // nothing
+    }
+
+    @Override
+    public void onEndManaAbility(Game game, Player player, boolean success) {
+        // nothing
+    }
+
+    @Override
     public void onBeginCastSpell(Game game, Player player, mage.abilities.SpellAbility ability, mage.ApprovingObject approvingObject) {
         // nothing
     }

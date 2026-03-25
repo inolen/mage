@@ -1527,6 +1527,7 @@ public abstract class PlayerImpl implements Player, Serializable {
     }
 
     protected boolean playManaAbility(ActivatedManaAbilityImpl ability, Game game) {
+        DataCollectorServices.getInstance().onBeginManaAbility(game, this, ability);
         int bookmark = game.bookmarkState();
         //20260116 - 109.4a
         //The controller of a mana ability is determined as though it were on the stack.
@@ -1540,9 +1541,11 @@ public abstract class PlayerImpl implements Player, Serializable {
             } else {
                 resetStoredBookmark(game);
             }
+            DataCollectorServices.getInstance().onEndManaAbility(game, this, true);
             return true;
         }
         restoreState(bookmark, ability.getRule(), game);
+        DataCollectorServices.getInstance().onEndManaAbility(game, this, false);
         return false;
     }
 
@@ -5778,7 +5781,7 @@ public abstract class PlayerImpl implements Player, Serializable {
     public boolean choose(Outcome outcome, Choice choice, Game game) {
         boolean result = doChoose(outcome, choice, game);
         if (!game.isSimulation()) {
-            ChooseKind kind = choice.isManaColorChoice() ? ChooseKind.PAYMENT : ChooseKind.GENERIC;
+            ChooseKind kind = choice.isManaColorChoice() ? ChooseKind.MANA_PAYMENT : ChooseKind.GENERIC;
             DataCollectorServices.getInstance().onChoose(game, this, choice, kind);
         }
         return result;

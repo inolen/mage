@@ -110,6 +110,9 @@ public interface DataCollector {
     void onBeginActivateAbility(Game game, Player player, mage.abilities.ActivatedAbility ability);
     void onEndActivateAbility(Game game, Player player, boolean success);
 
+    void onBeginManaAbility(Game game, Player player, mage.abilities.mana.ActivatedManaAbilityImpl ability);
+    void onEndManaAbility(Game game, Player player, boolean success);
+
     void onBeginCastSpell(Game game, Player player, mage.abilities.SpellAbility ability, mage.ApprovingObject approvingObject);
     void onEndCastSpell(Game game, Player player, boolean success);
 

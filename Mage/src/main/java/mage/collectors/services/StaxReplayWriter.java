@@ -130,6 +130,8 @@ public class StaxReplayWriter extends EmptyDataCollector {
     private Ability currentAbility = null;
     private String currentPlayerName = null;
     private mage.ApprovingObject currentApprovingObject = null;
+    private boolean inManaAbility = false;
+    private final List<StaxEvent> manaAbilityChoices = new ArrayList<>();
     private final List<StaxEvent> abilityChoices = new ArrayList<>();
     private String scryPlayer = null;
     private java.util.List<String> scryTopCards = null;
@@ -696,6 +698,8 @@ public class StaxReplayWriter extends EmptyDataCollector {
         }
 
         pushAction(StaxEventType.TAP_MANA, player, sourceRef, manaArg, "");
+        pendingEvents.addAll(manaAbilityChoices);
+        manaAbilityChoices.clear();
     }
 
     private int findManaAbilityIndex(Permanent source, Mana producedMana, Game game) {
@@ -836,10 +840,26 @@ public class StaxReplayWriter extends EmptyDataCollector {
             se.arg = ref;
             se.manaArgs = "";
             se.targets = "";
-            abilityChoices.add(se);
+            if (inManaAbility) {
+                manaAbilityChoices.add(se);
+            } else {
+                abilityChoices.add(se);
+            }
         } else {
             pushAction(StaxEventType.CHOOSE, player, ref);
         }
+    }
+
+    @Override
+    public void onBeginManaAbility(Game game, Player player, mage.abilities.mana.ActivatedManaAbilityImpl ability) {
+        inManaAbility = true;
+        manaAbilityChoices.clear();
+    }
+
+    @Override
+    public void onEndManaAbility(Game game, Player player, boolean success) {
+        inManaAbility = false;
+        manaAbilityChoices.clear();
     }
 
     @Override
