@@ -241,6 +241,18 @@ final public class DataCollectorServices implements DataCollector {
     }
 
     @Override
+    public void onBeginTriggeredAbility(Game game, Player player, mage.abilities.TriggeredAbility ability) {
+        if (game.isSimulation()) return;
+        activeServices.forEach(c -> c.onBeginTriggeredAbility(game, player, ability));
+    }
+
+    @Override
+    public void onBeginLandPlay(Game game, Player player) {
+        if (game.isSimulation()) return;
+        activeServices.forEach(c -> c.onBeginLandPlay(game, player));
+    }
+
+    @Override
     public void onBeginCastSpell(Game game, Player player, mage.abilities.SpellAbility ability, mage.ApprovingObject approvingObject) {
         if (game.isSimulation()) return;
         activeServices.forEach(c -> c.onBeginCastSpell(game, player, ability, approvingObject));

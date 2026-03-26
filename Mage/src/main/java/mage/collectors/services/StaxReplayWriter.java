@@ -129,9 +129,15 @@ public class StaxReplayWriter extends EmptyDataCollector {
     private final Map<String, Integer> battlefieldInstanceCount = new HashMap<>();
 
     // Event queues
-    private final ArrayDeque<StaxEvent> pendingEvents = new ArrayDeque<>();
-    private final List<StaxEvent> manaAbilityChoices = new ArrayList<>();
+    private final List<StaxEvent> pendingEvents = new ArrayList<>();
     private final List<StaxEvent> abilityChoices = new ArrayList<>();
+
+    // Mana ability state
+    private boolean inManaAbility = false;
+
+    // Insert position for events that should appear before reveals from applyEffects
+    // (used by triggers and land plays whose events fire after moveCards' applyEffects)
+    private int actionInsertIndex = -1;
 
     // Cast spell state
     private Ability currentAbility = null;
@@ -139,8 +145,6 @@ public class StaxReplayWriter extends EmptyDataCollector {
     private mage.ApprovingObject currentApprovingObject = null;
     private StaxEvent pendingCastEvent = null;
 
-    // Mana ability state
-    private boolean inManaAbility = false;
 
     // Scry state
     private String scryPlayer = null;
@@ -622,8 +626,8 @@ public class StaxReplayWriter extends EmptyDataCollector {
         // onChooseUse already queued a choose "Yes". Pop it, push leyline,
         // push choose back. Flushed by onGameReady.
         StaxEvent chooseEvent = null;
-        if (!pendingEvents.isEmpty() && pendingEvents.peekLast().type == StaxEventType.CHOOSE) {
-            chooseEvent = pendingEvents.removeLast();
+        if (!pendingEvents.isEmpty() && pendingEvents.get(pendingEvents.size() - 1).type == StaxEventType.CHOOSE) {
+            chooseEvent = pendingEvents.remove(pendingEvents.size() - 1);
         }
         Player p = requirePlayer(game, playerId);
         String name = resolveCardName(game, cardId);
@@ -651,7 +655,6 @@ public class StaxReplayWriter extends EmptyDataCollector {
     public void onGameEvent(Game game, GameEvent event) {
         switch (event.getType()) {
             case LAND_PLAYED:        handleLandPlayed(game, event); break;
-            case MANA_ADDED:         handleManaAdded(game, event); break;
             case ATTACKER_DECLARED:  handleAttackerDeclared(game, event); break;
             case BLOCKER_DECLARED:   handleBlockerDeclared(game, event); break;
             case TRIGGERED_ABILITY:  handleTriggeredAbility(game, event); break;
@@ -666,79 +669,21 @@ public class StaxReplayWriter extends EmptyDataCollector {
     private void handleLandPlayed(Game game, GameEvent event) {
         String player = requirePlayer(game, event.getPlayerId()).getName();
         String card = formatCardInstance(resolveCardName(game, event.getTargetId()), 0);
-        pushEvent(StaxEventType.PLAY_LAND, player, card);
+        StaxEvent se = new StaxEvent();
+        se.type = StaxEventType.PLAY_LAND;
+        se.player = player;
+        se.arg = card;
+        se.manaArgs = "";
+        se.targets = "";
+        if (actionInsertIndex >= 0 && actionInsertIndex <= pendingEvents.size()) {
+            pendingEvents.add(actionInsertIndex, se);
+            actionInsertIndex = -1;
+        } else {
+            pendingEvents.add(se);
+        }
     }
 
-    private void handleManaAdded(Game game, GameEvent event) {
-        if (currentAbility == null) {
-            throw new IllegalStateException("MANA_ADDED fired outside of playAbility/cast context");
-        }
-        if (!(event instanceof ManaEvent)) {
-            throw new IllegalStateException("MANA_ADDED event is not a ManaEvent");
-        }
-        Mana mana = ((ManaEvent) event).getMana();
-        if (mana == null || mana.count() == 0) {
-            return;
-        }
 
-        String player = requirePlayer(game, event.getPlayerId()).getName();
-        Permanent source = game.getPermanent(event.getSourceId());
-        if (source == null) {
-            return;
-        }
-        String sourceRef = formatCardInstance(source.getName(), cardInstance(source.getId()));
-
-        /* Emit {IDX:N} when multiple mana abilities exist */
-        String manaArg = "";
-        int manaAbilityCount = 0;
-        for (Ability ability : source.getAbilities(game)) {
-            if (ability instanceof ManaAbility) {
-                manaAbilityCount++;
-            }
-        }
-        if (manaAbilityCount > 1) {
-            int idx = findManaAbilityIndex(source, mana, game);
-            if (idx > 0) {
-                manaArg = String.format("{IDX:%d}", idx);
-            }
-        }
-
-        pushEvent(StaxEventType.TAP_MANA, player, sourceRef, manaArg, "");
-        pushEvents(manaAbilityChoices);
-        manaAbilityChoices.clear();
-    }
-
-    private int findManaAbilityIndex(Permanent source, Mana producedMana, Game game) {
-        int idx = 0;
-        for (Ability ability : source.getAbilities(game)) {
-            if (ability instanceof ManaAbility) {
-                /* Check if this ability could have produced the given mana */
-                for (Effect effect : ability.getEffects()) {
-                    if (effect instanceof AddManaOfAnyColorEffect) {
-                        return idx;
-                    }
-                    if (effect instanceof mage.abilities.effects.mana.BasicManaEffect) {
-                        Mana template = ((mage.abilities.effects.mana.BasicManaEffect) effect).getManaTemplate();
-                        if (manaMatchesTemplate(producedMana, template)) {
-                            return idx;
-                        }
-                    }
-                }
-                idx++;
-            }
-        }
-        return 0;
-    }
-
-    private static boolean manaMatchesTemplate(Mana produced, Mana template) {
-        if (template.getWhite() > 0 && produced.getWhite() > 0) return true;
-        if (template.getBlue() > 0 && produced.getBlue() > 0) return true;
-        if (template.getBlack() > 0 && produced.getBlack() > 0) return true;
-        if (template.getRed() > 0 && produced.getRed() > 0) return true;
-        if (template.getGreen() > 0 && produced.getGreen() > 0) return true;
-        if (template.getColorless() > 0 && produced.getColorless() > 0) return true;
-        return false;
-    }
 
     private void handleAttackerDeclared(Game game, GameEvent event) {
         String player = requirePlayer(game, event.getPlayerId()).getName();
@@ -837,7 +782,7 @@ public class StaxReplayWriter extends EmptyDataCollector {
 
     private void popUntilEvent(StaxEvent event) {
         while (!pendingEvents.isEmpty()) {
-            StaxEvent popped = pendingEvents.removeLast();
+            StaxEvent popped = pendingEvents.remove(pendingEvents.size() - 1);
             if (popped == event) {
                 return;
             }
@@ -854,33 +799,64 @@ public class StaxReplayWriter extends EmptyDataCollector {
         if (scryPlayer != null) {
             return;
         }
-        if (currentAbility != null) {
+        if (inManaAbility) {
+            pushEvent(StaxEventType.CHOOSE, player, ref);
+        } else if (currentAbility != null) {
             StaxEvent se = new StaxEvent();
             se.type = StaxEventType.CHOOSE;
             se.player = player;
             se.arg = ref;
             se.manaArgs = "";
             se.targets = "";
-            if (inManaAbility) {
-                manaAbilityChoices.add(se);
-            } else {
-                abilityChoices.add(se);
-            }
+            abilityChoices.add(se);
         } else {
             pushEvent(StaxEventType.CHOOSE, player, ref);
         }
     }
 
     @Override
+    public void onBeginTriggeredAbility(Game game, Player player, mage.abilities.TriggeredAbility ability) {
+        actionInsertIndex = pendingEvents.size();
+    }
+
+    @Override
+    public void onBeginLandPlay(Game game, Player player) {
+        actionInsertIndex = pendingEvents.size();
+    }
+
+    @Override
     public void onBeginManaAbility(Game game, Player player, mage.abilities.mana.ActivatedManaAbilityImpl ability) {
         inManaAbility = true;
-        manaAbilityChoices.clear();
+        Permanent source = game.getPermanent(ability.getSourceId());
+        if (source == null) {
+            return;
+        }
+        String playerName = player.getName();
+        String sourceRef = formatCardInstance(source.getName(), cardInstance(source.getId()));
+
+        String manaArg = "";
+        int manaAbilityCount = 0;
+        int abilityIdx = 0;
+        int matchIdx = -1;
+        for (Ability a : source.getAbilities(game)) {
+            if (a instanceof ManaAbility) {
+                if (a.getOriginalId().equals(ability.getOriginalId())) {
+                    matchIdx = abilityIdx;
+                }
+                manaAbilityCount++;
+                abilityIdx++;
+            }
+        }
+        if (manaAbilityCount > 1 && matchIdx > 0) {
+            manaArg = String.format("{IDX:%d}", matchIdx);
+        }
+
+        pushEvent(StaxEventType.TAP_MANA, playerName, sourceRef, manaArg, "");
     }
 
     @Override
     public void onEndManaAbility(Game game, Player player, boolean success) {
         inManaAbility = false;
-        manaAbilityChoices.clear();
     }
 
     @Override
@@ -1214,7 +1190,18 @@ public class StaxReplayWriter extends EmptyDataCollector {
             manaArgs = String.format("{IDX:%d}", abilityIndex);
         }
 
-        pushEvent(StaxEventType.TRIGGER, "", arg, manaArgs, targets);
+        StaxEvent se = new StaxEvent();
+        se.type = StaxEventType.TRIGGER;
+        se.player = "";
+        se.arg = arg;
+        se.manaArgs = manaArgs;
+        se.targets = targets;
+        if (actionInsertIndex >= 0 && actionInsertIndex <= pendingEvents.size()) {
+            pendingEvents.add(actionInsertIndex, se);
+            actionInsertIndex = -1;
+        } else {
+            pendingEvents.add(se);
+        }
     }
 
     private int findTriggeredAbilityIndex(Game game, UUID sourceId, StackObject stackObj) {

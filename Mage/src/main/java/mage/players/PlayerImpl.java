@@ -1438,6 +1438,7 @@ public abstract class PlayerImpl implements Player, Serializable {
             landEventBefore.setZone(cardZoneBefore);
             game.fireEvent(landEventBefore);
 
+            DataCollectorServices.getInstance().onBeginLandPlay(game, this);
             if (moveCards(card, Zone.BATTLEFIELD, playLandAbility, game, false, false, false, null)) {
                 incrementLandsPlayed();
                 GameEvent landEventAfter = GameEvent.getEvent(GameEvent.EventType.LAND_PLAYED,
@@ -1731,6 +1732,7 @@ public abstract class PlayerImpl implements Player, Serializable {
             if (ability.isUsesStack()) {
                 game.getStack().push(game, new StackAbility(ability, playerId));
             }
+            DataCollectorServices.getInstance().onBeginTriggeredAbility(game, this, ability);
             if (ability.activate(game, false)) {
                 if ((ability.isUsesStack()
                         || ability.getRuleVisible())
