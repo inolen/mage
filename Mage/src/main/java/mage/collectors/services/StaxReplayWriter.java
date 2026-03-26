@@ -122,21 +122,30 @@ public class StaxReplayWriter extends EmptyDataCollector {
      * ------------------------------------------------------------------- */
 
     private final Path replayFile;
-    private int currentTurn;
-    private String currentStepKey;
+    private GameSnapshot lastSnapshot;
+
+    // Instance tracking
     private final Map<UUID, Integer> cardInstanceMap = new HashMap<>();
     private final Map<String, Integer> battlefieldInstanceCount = new HashMap<>();
+
+    // Event queues
     private final ArrayDeque<StaxEvent> pendingEvents = new ArrayDeque<>();
+    private final List<StaxEvent> manaAbilityChoices = new ArrayList<>();
+    private final List<StaxEvent> abilityChoices = new ArrayList<>();
+
+    // Cast spell state
     private Ability currentAbility = null;
     private String currentPlayerName = null;
     private mage.ApprovingObject currentApprovingObject = null;
+    private StaxEvent pendingCastEvent = null;
+
+    // Mana ability state
     private boolean inManaAbility = false;
-    private final List<StaxEvent> manaAbilityChoices = new ArrayList<>();
-    private final List<StaxEvent> abilityChoices = new ArrayList<>();
+
+    // Scry state
     private String scryPlayer = null;
     private java.util.List<String> scryTopCards = null;
     private java.util.List<String> scryBottomCards = null;
-    private GameSnapshot lastSnapshot;
 
     public StaxReplayWriter() {
         if (REPLAY_FILE != null) {
@@ -371,9 +380,6 @@ public class StaxReplayWriter extends EmptyDataCollector {
 
     @Override
     public void onGameStart(Game game) {
-        this.currentTurn = 0;
-        this.currentStepKey = null;
-
         this.pendingEvents.clear();
         this.lastSnapshot = null;
         this.cardInstanceMap.clear();
@@ -514,9 +520,9 @@ public class StaxReplayWriter extends EmptyDataCollector {
 
     @Override
     public void onTurnBegin(Game game) {
-        currentTurn = game.getState().getTurnNum();
+        int turnNum = game.getState().getTurnNum();
         write("");
-        write(String.format("begin turn %d", currentTurn));
+        write(String.format("begin turn %d", turnNum));
     }
 
     @Override
@@ -608,7 +614,7 @@ public class StaxReplayWriter extends EmptyDataCollector {
     @Override
     public void onMulliganDecision(Game game, UUID playerId, boolean keep) {
         Player p = requirePlayer(game, playerId);
-        pushAction(keep ? StaxEventType.KEEP : StaxEventType.MULLIGAN, p.getName(), "");
+        pushEvent(keep ? StaxEventType.KEEP : StaxEventType.MULLIGAN, p.getName(), "");
     }
 
     @Override
@@ -621,7 +627,7 @@ public class StaxReplayWriter extends EmptyDataCollector {
         }
         Player p = requirePlayer(game, playerId);
         String name = resolveCardName(game, cardId);
-        pushAction(StaxEventType.LEYLINE, p.getName(), formatCardInstance(name, 0), "", "");
+        pushEvent(StaxEventType.LEYLINE, p.getName(), formatCardInstance(name, 0), "", "");
         if (chooseEvent != null) {
             pendingEvents.add(chooseEvent);
         }
@@ -638,7 +644,7 @@ public class StaxReplayWriter extends EmptyDataCollector {
     @Override
     public void onPlayerPass(Game game, UUID playerId) {
         Player p = requirePlayer(game, playerId);
-        pushAction(StaxEventType.PASS, p.getName(), "");
+        pushEvent(StaxEventType.PASS, p.getName(), "");
     }
 
     @Override
@@ -660,7 +666,7 @@ public class StaxReplayWriter extends EmptyDataCollector {
     private void handleLandPlayed(Game game, GameEvent event) {
         String player = requirePlayer(game, event.getPlayerId()).getName();
         String card = formatCardInstance(resolveCardName(game, event.getTargetId()), 0);
-        pushAction(StaxEventType.PLAY_LAND, player, card);
+        pushEvent(StaxEventType.PLAY_LAND, player, card);
     }
 
     private void handleManaAdded(Game game, GameEvent event) {
@@ -697,8 +703,8 @@ public class StaxReplayWriter extends EmptyDataCollector {
             }
         }
 
-        pushAction(StaxEventType.TAP_MANA, player, sourceRef, manaArg, "");
-        pendingEvents.addAll(manaAbilityChoices);
+        pushEvent(StaxEventType.TAP_MANA, player, sourceRef, manaArg, "");
+        pushEvents(manaAbilityChoices);
         manaAbilityChoices.clear();
     }
 
@@ -741,14 +747,14 @@ public class StaxReplayWriter extends EmptyDataCollector {
         String defenderName = defender != null
                 ? defender.getName()
                 : formatCardInstance(resolveCardName(game, event.getTargetId()), cardInstance(event.getTargetId()));
-        pushAction(StaxEventType.DECLARE_ATTACKER, player, attackerRef, "", defenderName);
+        pushEvent(StaxEventType.DECLARE_ATTACKER, player, attackerRef, "", defenderName);
     }
 
     private void handleBlockerDeclared(Game game, GameEvent event) {
         String player = requirePlayer(game, event.getPlayerId()).getName();
         String blockerRef = formatCardInstance(resolveCardName(game, event.getSourceId()), cardInstance(event.getSourceId()));
         String attackerRef = formatCardInstance(resolveCardName(game, event.getTargetId()), cardInstance(event.getTargetId()));
-        pushAction(StaxEventType.DECLARE_BLOCKER, player, blockerRef, "", attackerRef);
+        pushEvent(StaxEventType.DECLARE_BLOCKER, player, blockerRef, "", attackerRef);
     }
 
 
@@ -778,7 +784,7 @@ public class StaxReplayWriter extends EmptyDataCollector {
         Player p = requirePlayer(game, event.getPlayerId());
         String arg = formatCardInstance(resolveCardName(game, event.getTargetId()), 0);
         StaxEventType type = p.isDrawsFromBottom() ? StaxEventType.DRAW_BOTTOM : StaxEventType.DRAW;
-        pushAction(type, p.getName(), arg);
+        pushEvent(type, p.getName(), arg);
     }
 
     private void handleCreatedToken(Game game, GameEvent event) {
@@ -789,7 +795,7 @@ public class StaxReplayWriter extends EmptyDataCollector {
         String name = resolveCardName(game, event.getTargetId());
         Player owner = requirePlayer(game, event.getPlayerId());
         String arg = formatCardInstance(name, 0);
-        pushAction(StaxEventType.MILL, owner.getName(), arg);
+        pushEvent(StaxEventType.MILL, owner.getName(), arg);
     }
 
     private void handleZoneChange(Game game, GameEvent event) {
@@ -809,7 +815,7 @@ public class StaxReplayWriter extends EmptyDataCollector {
         }
     }
 
-    private void pushAction(StaxEventType type, String player, String arg,
+    private StaxEvent pushEvent(StaxEventType type, String player, String arg,
                              String manaArgs, String targets) {
         StaxEvent se = new StaxEvent();
         se.type = type;
@@ -818,11 +824,26 @@ public class StaxReplayWriter extends EmptyDataCollector {
         se.manaArgs = manaArgs != null ? manaArgs : "";
         se.targets = targets != null ? targets : "";
         pendingEvents.add(se);
+        return se;
     }
 
-    private void pushAction(StaxEventType type, String player, String arg) {
-        pushAction(type, player, arg, "", "");
+    private StaxEvent pushEvent(StaxEventType type, String player, String arg) {
+        return pushEvent(type, player, arg, "", "");
     }
+
+    private void pushEvents(List<StaxEvent> events) {
+        pendingEvents.addAll(events);
+    }
+
+    private void popUntilEvent(StaxEvent event) {
+        while (!pendingEvents.isEmpty()) {
+            StaxEvent popped = pendingEvents.removeLast();
+            if (popped == event) {
+                return;
+            }
+        }
+    }
+
 
     // XMage's AI (ComputerPlayer7) picks actions by simulating future game states,
     // then replays the chosen action on the real game.  Targets selected during
@@ -846,7 +867,7 @@ public class StaxReplayWriter extends EmptyDataCollector {
                 abilityChoices.add(se);
             }
         } else {
-            pushAction(StaxEventType.CHOOSE, player, ref);
+            pushEvent(StaxEventType.CHOOSE, player, ref);
         }
     }
 
@@ -894,8 +915,8 @@ public class StaxReplayWriter extends EmptyDataCollector {
                 }
             }
 
-            pushAction(StaxEventType.ACTIVATE_ABILITY, currentPlayerName, sourceRef, manaArgs, targets);
-            pendingEvents.addAll(abilityChoices);
+            pushEvent(StaxEventType.ACTIVATE_ABILITY, currentPlayerName, sourceRef, manaArgs, targets);
+            pushEvents(abilityChoices);
         }
         currentAbility = null;
         currentPlayerName = null;
@@ -908,6 +929,17 @@ public class StaxReplayWriter extends EmptyDataCollector {
         currentPlayerName = player.getName();
         currentApprovingObject = approvingObject;
         abilityChoices.clear();
+        pendingCastEvent = null;
+
+        // Emit cast entry early (before spell.activate) so it appears before
+        // any reveals/taps from the casting process.  The replay driver needs
+        // the cast action at the priority decision point, before applyEffects
+        // calls inside activate() produce reveal entries.
+        if (approvingObject == null) {
+            String name = resolveCardName(game, ability.getSourceId());
+            pendingCastEvent = pushEvent(StaxEventType.CAST_SPELL, player.getName(),
+                    formatCardInstance(name, 0), "", "");
+        }
     }
 
     @Override
@@ -921,32 +953,34 @@ public class StaxReplayWriter extends EmptyDataCollector {
                 if (stackObj != null) {
                     emitTargetChoices(game, stackObj, currentPlayerName);
                 }
-            } else {
+            } else if (pendingCastEvent != null) {
+                // Update the cast event pushed in onBeginCastSpell with mana/target info.
                 StackObject stackObj = requireStackObject(game, currentAbility.getId());
-
-                String name;
-                String manaArgs = "";
-                String targets = "";
 
                 if (stackObj instanceof Spell) {
                     Spell spell = (Spell) stackObj;
-                    name = spell.getName();
                     Mana usedMana = spell.getSpellAbility().getManaCostsToPay().getUsedManaToPay();
-                    manaArgs = convertManaPaymentToArgs(usedMana);
-                    targets = extractTargets(game, spell);
-                } else {
-                    name = resolveCardName(game, currentAbility.getId());
+                    String manaArgs = convertManaPaymentToArgs(usedMana);
+                    Map<String, Object> costsTag = spell.getSpellAbility().getCostsTagMap();
+                    if (costsTag != null && costsTag.containsKey("X")) {
+                        int xValue = (Integer) costsTag.get("X");
+                        String xArg = String.format("{X:%d}", xValue);
+                        manaArgs = manaArgs.isEmpty() ? xArg : manaArgs + " " + xArg;
+                    }
+                    pendingCastEvent.manaArgs = manaArgs;
+                    pendingCastEvent.targets = extractTargets(game, spell);
                 }
-
-                pushAction(StaxEventType.CAST_SPELL, currentPlayerName,
-                        formatCardInstance(name, 0), manaArgs, targets);
             }
 
-            pendingEvents.addAll(abilityChoices);
+            pushEvents(abilityChoices);
+        } else if (!success && pendingCastEvent != null) {
+            // Cast failed — remove the early-emitted cast event
+            popUntilEvent(pendingCastEvent);
         }
         currentAbility = null;
         currentPlayerName = null;
         currentApprovingObject = null;
+        pendingCastEvent = null;
         abilityChoices.clear();
     }
 
@@ -955,7 +989,7 @@ public class StaxReplayWriter extends EmptyDataCollector {
         if (scryPlayer != null) {
             return;
         }
-        pushAction(StaxEventType.CHOOSE, player.getName(),
+        pushEvent(StaxEventType.CHOOSE, player.getName(),
             String.format("\"%s\"", choice ? "Yes" : "No"));
     }
 
@@ -963,7 +997,7 @@ public class StaxReplayWriter extends EmptyDataCollector {
     public void onChooseRandom(Game game, Player player, Card card, mage.constants.ChooseContext context) {
         StaxEventType eventType = context == mage.constants.ChooseContext.DISCARD
             ? StaxEventType.DISCARD : StaxEventType.CHOOSE;
-        pushAction(eventType, player.getName(), String.format("\"%s\"", card.getName()));
+        pushEvent(eventType, player.getName(), String.format("\"%s\"", card.getName()));
     }
 
     @Override
@@ -984,7 +1018,7 @@ public class StaxReplayWriter extends EmptyDataCollector {
                     Card card = game.getCard(targetId);
                     if (card != null) {
                         if (isDiscard) {
-                            pushAction(StaxEventType.DISCARD, player.getName(),
+                            pushEvent(StaxEventType.DISCARD, player.getName(),
                                 String.format("\"%s\"", card.getName()));
                         } else {
                             pushChoose(player.getName(), formatCardInstance(card.getName(), cardInstance(card.getId())), kind);
@@ -1011,7 +1045,7 @@ public class StaxReplayWriter extends EmptyDataCollector {
                 if (i > 0) sb.append(' ');
                 sb.append(choices.get(i).getChoice());
             }
-            pushAction(StaxEventType.DIVIDE, player.getName(), sb.toString());
+            pushEvent(StaxEventType.DIVIDE, player.getName(), sb.toString());
         }
     }
 
@@ -1042,7 +1076,7 @@ public class StaxReplayWriter extends EmptyDataCollector {
         Card topCard = player.getLibrary().getFromTop(game);
         if (topCard != null) {
             String arg = formatCardInstance(topCard.getName(), 0);
-            pushAction(StaxEventType.PEEK, player.getName(), "library." + arg);
+            pushEvent(StaxEventType.PEEK, player.getName(), "library." + arg);
         }
     }
 
@@ -1062,7 +1096,7 @@ public class StaxReplayWriter extends EmptyDataCollector {
             sj.add(formatCardInstance(card.getName(), 0));
         }
         if (zoneName != null && sj.toString().length() > 0) {
-            pushAction(StaxEventType.LOOK, player.getName(), zoneName + "." + sj.toString());
+            pushEvent(StaxEventType.LOOK, player.getName(), zoneName + "." + sj.toString());
         }
     }
 
@@ -1098,7 +1132,7 @@ public class StaxReplayWriter extends EmptyDataCollector {
                 sb.append(" ").append(formatCardInstance(name, 0));
             }
         }
-        pushAction(StaxEventType.SCRY, scryPlayer, sb.toString());
+        pushEvent(StaxEventType.SCRY, scryPlayer, sb.toString());
         scryPlayer = null;
         scryTopCards = null;
         scryBottomCards = null;
@@ -1117,7 +1151,7 @@ public class StaxReplayWriter extends EmptyDataCollector {
                 continue;
             }
             String arg = formatCardInstance(card.getName(), 0);
-            pushAction(StaxEventType.REVEAL, player.getName(), zoneName + "." + arg);
+            pushEvent(StaxEventType.REVEAL, player.getName(), zoneName + "." + arg);
         }
     }
 
@@ -1157,7 +1191,7 @@ public class StaxReplayWriter extends EmptyDataCollector {
                         ref = formatCardInstance(resolveCardName(game, targetId), 0);
                     }
                 }
-                pushAction(StaxEventType.CHOOSE, player, ref);
+                pushEvent(StaxEventType.CHOOSE, player, ref);
             }
         }
     }
@@ -1180,7 +1214,7 @@ public class StaxReplayWriter extends EmptyDataCollector {
             manaArgs = String.format("{IDX:%d}", abilityIndex);
         }
 
-        pushAction(StaxEventType.TRIGGER, "", arg, manaArgs, targets);
+        pushEvent(StaxEventType.TRIGGER, "", arg, manaArgs, targets);
     }
 
     private int findTriggeredAbilityIndex(Game game, UUID sourceId, StackObject stackObj) {
