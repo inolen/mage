@@ -61,8 +61,7 @@ public class ComputerPlayer7 extends ComputerPlayer6 {
                     // TODO: is it possible non empty actions without calculation?!
                     throw new IllegalStateException("wtf");
                 }
-                act(game);
-                return true;
+                return act(game);
             case BEGIN_COMBAT:
                 pass(game);
                 return false;
@@ -74,8 +73,7 @@ public class ComputerPlayer7 extends ComputerPlayer6 {
                     // TODO: is it possible non empty actions without calculation?!
                     throw new IllegalStateException("wtf");
                 }
-                act(game);
-                return true;
+                return act(game);
             case DECLARE_BLOCKERS:
                 printBattlefieldScore(game, "Sim PRIORITY on DECLARE BLOCKERS");
                 if (actions.isEmpty()) {
@@ -84,8 +82,7 @@ public class ComputerPlayer7 extends ComputerPlayer6 {
                     // TODO: is it possible non empty actions without calculation?!
                     throw new IllegalStateException("wtf");
                 }
-                act(game);
-                return true;
+                return act(game);
             case FIRST_COMBAT_DAMAGE:
             case COMBAT_DAMAGE:
             case END_COMBAT:
@@ -99,8 +96,7 @@ public class ComputerPlayer7 extends ComputerPlayer6 {
                     // TODO: is it possible non empty actions without calculation?!
                     throw new IllegalStateException("wtf");
                 }
-                act(game);
-                return true;
+                return act(game);
             case END_TURN:
             case CLEANUP:
                 actionCache.clear();

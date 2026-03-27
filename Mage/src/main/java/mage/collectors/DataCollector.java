@@ -99,6 +99,9 @@ public interface DataCollector {
 
     void onPlayerPass(Game game, UUID playerId);
 
+    void onDeclareAttacker(Game game, UUID playerId, UUID attackerId, UUID defenderId);
+    void onDeclareBlocker(Game game, UUID playerId, UUID blockerId, UUID attackerId);
+
     void onChooseUse(Game game, Player player, boolean choice);
 
     void onChooseRandom(Game game, Player player, Card card, mage.constants.ChooseContext context);

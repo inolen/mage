@@ -205,6 +205,18 @@ final public class DataCollectorServices implements DataCollector {
     }
 
     @Override
+    public void onDeclareAttacker(Game game, UUID playerId, UUID attackerId, UUID defenderId) {
+        if (game.isSimulation()) return;
+        activeServices.forEach(c -> c.onDeclareAttacker(game, playerId, attackerId, defenderId));
+    }
+
+    @Override
+    public void onDeclareBlocker(Game game, UUID playerId, UUID blockerId, UUID attackerId) {
+        if (game.isSimulation()) return;
+        activeServices.forEach(c -> c.onDeclareBlocker(game, playerId, blockerId, attackerId));
+    }
+
+    @Override
     public void onChooseUse(Game game, Player player, boolean choice) {
         if (game.isSimulation()) return;
         activeServices.forEach(c -> c.onChooseUse(game, player, choice));

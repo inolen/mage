@@ -655,8 +655,6 @@ public class StaxReplayWriter extends EmptyDataCollector {
     public void onGameEvent(Game game, GameEvent event) {
         switch (event.getType()) {
             case LAND_PLAYED:        handleLandPlayed(game, event); break;
-            case ATTACKER_DECLARED:  handleAttackerDeclared(game, event); break;
-            case BLOCKER_DECLARED:   handleBlockerDeclared(game, event); break;
             case TRIGGERED_ABILITY:  handleTriggeredAbility(game, event); break;
             case DREW_CARD:          handleDrewCard(game, event); break;
             case CREATED_TOKEN:      handleCreatedToken(game, event); break;
@@ -664,6 +662,25 @@ public class StaxReplayWriter extends EmptyDataCollector {
             case MILLED_CARD:        handleMilledCard(game, event); break;
             default: break;
         }
+    }
+
+    @Override
+    public void onDeclareAttacker(Game game, UUID playerId, UUID attackerId, UUID defenderId) {
+        String player = requirePlayer(game, playerId).getName();
+        String attackerRef = formatCardInstance(resolveCardName(game, attackerId), cardInstance(attackerId));
+        Player defender = game.getPlayer(defenderId);
+        String defenderName = defender != null
+                ? defender.getName()
+                : formatCardInstance(resolveCardName(game, defenderId), cardInstance(defenderId));
+        pushEvent(StaxEventType.DECLARE_ATTACKER, player, attackerRef, "", defenderName);
+    }
+
+    @Override
+    public void onDeclareBlocker(Game game, UUID playerId, UUID blockerId, UUID attackerId) {
+        String player = requirePlayer(game, playerId).getName();
+        String blockerRef = formatCardInstance(resolveCardName(game, blockerId), cardInstance(blockerId));
+        String attackerRef = formatCardInstance(resolveCardName(game, attackerId), cardInstance(attackerId));
+        pushEvent(StaxEventType.DECLARE_BLOCKER, player, blockerRef, "", attackerRef);
     }
 
     private void handleLandPlayed(Game game, GameEvent event) {
@@ -684,23 +701,6 @@ public class StaxReplayWriter extends EmptyDataCollector {
     }
 
 
-
-    private void handleAttackerDeclared(Game game, GameEvent event) {
-        String player = requirePlayer(game, event.getPlayerId()).getName();
-        String attackerRef = formatCardInstance(resolveCardName(game, event.getSourceId()), cardInstance(event.getSourceId()));
-        Player defender = game.getPlayer(event.getTargetId());
-        String defenderName = defender != null
-                ? defender.getName()
-                : formatCardInstance(resolveCardName(game, event.getTargetId()), cardInstance(event.getTargetId()));
-        pushEvent(StaxEventType.DECLARE_ATTACKER, player, attackerRef, "", defenderName);
-    }
-
-    private void handleBlockerDeclared(Game game, GameEvent event) {
-        String player = requirePlayer(game, event.getPlayerId()).getName();
-        String blockerRef = formatCardInstance(resolveCardName(game, event.getSourceId()), cardInstance(event.getSourceId()));
-        String attackerRef = formatCardInstance(resolveCardName(game, event.getTargetId()), cardInstance(event.getTargetId()));
-        pushEvent(StaxEventType.DECLARE_BLOCKER, player, blockerRef, "", attackerRef);
-    }
 
 
     private int findAbilityIndex(Game game, UUID sourceId, StackObject stackObj) {

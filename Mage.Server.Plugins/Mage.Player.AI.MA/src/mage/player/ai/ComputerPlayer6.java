@@ -169,12 +169,18 @@ public class ComputerPlayer6 extends ComputerPlayer {
         logger.info(sb.toString());
     }
 
-    protected void act(Game game) {
+    /**
+     * Execute all queued actions and pass if any used the stack.
+     * @return true if real actions were taken, false if only passed.
+     */
+    protected boolean act(Game game) {
         if (actions == null
                 || actions.isEmpty()) {
             pass(game);
+            return false;
         } else {
             boolean usedStack = false;
+            boolean hasRealAction = false;
             while (actions.peek() != null) {
                 Ability ability = actions.poll();
                 // example: ===> SELECTED ACTION for PlayerA: Play Swamp
@@ -182,6 +188,9 @@ public class ComputerPlayer6 extends ComputerPlayer {
                         getName(),
                         getAbilityAndSourceInfo(game, ability, true)
                 ));
+                if (!(ability instanceof mage.abilities.common.PassAbility)) {
+                    hasRealAction = true;
+                }
                 if (!ability.getTargets().isEmpty()) {
                     for (Target target : ability.getTargets()) {
                         for (UUID id : target.getTargets()) {
@@ -197,9 +206,7 @@ public class ComputerPlayer6 extends ComputerPlayer {
                     usedStack = true;
                 }
             }
-            if (usedStack) {
-                pass(game);
-            }
+            return hasRealAction;
         }
     }
 

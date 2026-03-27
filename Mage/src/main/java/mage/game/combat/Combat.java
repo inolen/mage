@@ -3,6 +3,7 @@ package mage.game.combat;
 import mage.MageObject;
 import mage.MageObjectReference;
 import mage.abilities.Ability;
+import mage.collectors.DataCollectorServices;
 import mage.abilities.effects.RequirementEffect;
 import mage.abilities.effects.RestrictionEffect;
 import mage.abilities.keyword.BandingAbility;
@@ -1469,6 +1470,7 @@ public class Combat implements Serializable, Copyable<Combat> {
                 || !addAttackerToCombat(creatureId, defenderId, game)) {
             return false;
         }
+        DataCollectorServices.getInstance().onDeclareAttacker(game, playerId, creatureId, defenderId);
         if (attacker.hasAbility(VigilanceAbility.getInstance(), game)
                 || attacker.hasAbility(JohanVigilanceAbility.getInstance(), game)) {
             return true;

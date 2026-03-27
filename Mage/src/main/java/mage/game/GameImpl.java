@@ -1979,28 +1979,6 @@ public abstract class GameImpl implements Game {
 
     @Override
     public synchronized void applyEffects() {
-        // Debug: dump caller for Telepathy reveal tracking (real game only)
-        if (!this.isSimulation() && state != null && state.getBattlefield() != null) {
-            boolean hasTelepathy = false;
-            for (Permanent perm : state.getBattlefield().getAllActivePermanents()) {
-                if (perm.getName().equals("Telepathy")) {
-                    hasTelepathy = true;
-                    break;
-                }
-            }
-            if (hasTelepathy) {
-                StackTraceElement[] stack = Thread.currentThread().getStackTrace();
-                StringBuilder sb = new StringBuilder("[AE] applyEffects called from:");
-                for (int i = 2; i < Math.min(stack.length, 8); i++) {
-                    sb.append("\n    ").append(stack[i].getClassName()).append(".").append(stack[i].getMethodName()).append(":").append(stack[i].getLineNumber());
-                }
-                try {
-                    java.io.FileWriter fw = new java.io.FileWriter("/tmp/ae-trace.log", true);
-                    fw.write(sb.toString() + "\n");
-                    fw.close();
-                } catch (Exception ignored) {}
-            }
-        }
         state.applyEffects(this);
     }
 

@@ -2903,6 +2903,7 @@ public abstract class PlayerImpl implements Player, Serializable {
         if (blocker != null && group != null && group.canBlock(blocker, game)) {
             group.addBlocker(blockerId, playerId, game);
             game.getCombat().addBlockingGroup(blockerId, attackerId, playerId, game);
+            DataCollectorServices.getInstance().onDeclareBlocker(game, playerId, blockerId, attackerId);
         } else if (this.isHuman() && !game.isSimulation()) {
             game.informPlayer(this, "You can't block this creature.");
         }

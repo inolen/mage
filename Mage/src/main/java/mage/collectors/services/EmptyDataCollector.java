@@ -119,6 +119,16 @@ public abstract class EmptyDataCollector implements DataCollector {
     }
 
     @Override
+    public void onDeclareAttacker(Game game, UUID playerId, UUID attackerId, UUID defenderId) {
+        // nothing
+    }
+
+    @Override
+    public void onDeclareBlocker(Game game, UUID playerId, UUID blockerId, UUID attackerId) {
+        // nothing
+    }
+
+    @Override
     public void onChooseUse(Game game, Player player, boolean choice) {
         // nothing
     }

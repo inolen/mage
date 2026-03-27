@@ -1156,7 +1156,7 @@ public class TestPlayer implements Player {
         }
 
         // normal priority (by AI or pass)
-        tryToPlayPriority(game);
+        boolean acted = tryToPlayPriority(game);
 
         // check to prevent endless loops
         if (numberOfActions == actions.size()) {
@@ -1169,7 +1169,7 @@ public class TestPlayer implements Player {
         } else {
             foundNoAction = 0;
         }
-        return false;
+        return acted;
     }
 
     private void changeAIControl(Game game, boolean enable) {
@@ -1208,11 +1208,12 @@ public class TestPlayer implements Player {
         }
     }
 
-    private void tryToPlayPriority(Game game) {
+    private boolean tryToPlayPriority(Game game) {
         if (AIPlayer || AIRealGameSimulation) {
-            computerPlayer.priority(game);
+            return computerPlayer.priority(game);
         } else {
             computerPlayer.pass(game);
+            return false;
         }
     }
 
